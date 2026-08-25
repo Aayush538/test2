@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gifts by Krivya — Love Across Miles | Send Meaningful Gifts Worldwide</title>
+  <meta name="description"
+    content="Gifts by Krivya — a boutique gifting brand that makes it easy to send meaningful gifts and surprises to loved ones anywhere in the world. Same-day delivery in Perth & Sydney.">
+  <meta name="keywords"
+    content="gifts, gift delivery, Nepal, Australia, worldwide gifts, Gifts by Krivya, surprise gifts, send gifts, love across miles">
+  <meta name="author" content="Gifts by Krivya">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Gifts by Krivya — Love Across Miles">
+  <meta property="og:description" content="Send meaningful gifts and surprises to loved ones anywhere in the world.">
+  <meta property="og:type" content="website">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/jpeg" href="images/Logo/giftsbykrivya.jpeg">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+
+<body>
+  <div id="toast-container"
+    style="position:fixed; top:20px; right:20px; z-index:2000; display:flex; flex-direction:column; gap:10px;"></div>
+  <!-- ════════════════════════════════════════════════════════
+       1. HEADER / NAVIGATION
+       ════════════════════════════════════════════════════════ -->
+  <header class="site-header" id="site-header">
+    <div class="container header-inner">
+
+      <!-- Brand -->
+      <div class="header-brand">
+        <img src="images/Logo/giftsbykrivya.jpeg" alt="Gifts by Krivya Logo" class="header-logo" style="cursor:pointer;"
+          title="Click to view logo"
+          onclick="event.preventDefault(); event.stopPropagation(); openLightbox('images/Logo/giftsbykrivya.jpeg', 'Gifts by Krivya — Love Across Miles', true);">
+        <a href="#hero" class="header-brand-text" onclick="window.scrollTo({top: 0, behavior: 'smooth'});"
+          aria-label="Go to top of Gifts by Krivya">
+          <span class="header-brand-name">Gifts by Krivya</span>
+          <span class="header-brand-tagline">Love Across Miles</span>
+        </a>
+      </div>
+
+      <!-- Desktop Nav -->
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#gift-menu">Gift Menu</a>
+        <a href="#order-form-section">Order</a>
+        <a href="#track-order-section">Track Order</a>
+        <a href="#franchise-section">Franchise</a>
+        <a href="#reviews-section">Reviews</a>
+      </nav>
+
+      <!-- Actions -->
+      <div class="header-actions">
+        <!-- Currency Toggle -->
+        <div class="currency-toggle" role="group" aria-label="Currency selector">
+          <button id="curr-npr" type="button">🇳🇵 NPR</button>
+          <button id="curr-aud" type="button" class="active">🇦🇺 AUD</button>
+        </div>
+
+        <!-- CTA -->
+        <a href="#order-form-section" class="btn btn-primary btn-sm" id="header-cta">
+          📝 Order Now
+        </a>
+
+        <!-- Mobile Menu Button -->
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Overlay -->
+  <div class="mobile-nav" id="mobile-nav">
+    <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">✕</button>
+    <a href="#hero">Home</a>
+    <a href="#gift-menu">Gift Menu</a>
+    <a href="#delivery-info">Delivery</a>
+    <a href="#order-form-section">Order Form</a>
+    <a href="#track-order-section">Track Order</a>
+    <a href="#franchise-section">Franchise</a>
+    <a href="#reviews-section">Reviews</a>
+    <a href="terms.html">Terms</a>
+  </div>
+
+  <!-- FLOATING CHECKOUT BADGE -->
+  <button id="checkout-badge" class="checkout-badge" onclick="openCartDrawer()" aria-label="View Cart">
+    <span class="icon">🛒</span>
+    <span class="count">0</span>
+  </button>
+
+  <!-- FLOATING ENQUIRY FAB (mobile only — see .mobile-enquiry-fab in style.css) -->
+  <button id="enquiry-fab" class="mobile-enquiry-fab" onclick="openCollectiveEnquiryModal()"
+    aria-label="Enquire about selected products">
+    <span class="icon">💝</span>
+    <span class="fab-label">Enquire</span>
+    <span class="fab-count">0</span>
+  </button>
+
+  <!-- ════════════════════════════════════════════════════════
+       2. HERO — WELCOME
+       ════════════════════════════════════════════════════════ -->
+  <section class="hero" id="hero">
+    <div class="floating-hearts" aria-hidden="true">
+      <span style="left:8%; animation-delay:0s; font-size:1rem;">💗</span>
+      <span style="left:22%; animation-delay:2s; font-size:0.9rem;">🎁</span>
+      <span style="left:45%; animation-delay:4s; font-size:1.1rem;">💝</span>
+      <span style="left:68%; animation-delay:1s; font-size:0.8rem;">🌸</span>
+      <span style="left:85%; animation-delay:3s; font-size:1rem;">💗</span>
+      <span style="left:55%; animation-delay:5s; font-size:0.7rem;">✨</span>
+      <span style="left:70%; animation-delay:6s; font-size:1rem;">💗</span>
+    </div>
+    <div class="container">
+      <div class="hero-content">
+        <span class="hero-badge">Gifts Made to Be Remembered</span>
+        <h1>Welcome to <span>Gifts by Krivya</span></h1>
+        <p>
+          Krivya is a gifting brand that makes it easy to send meaningful gifts and surprises
+          to loved ones anywhere in the world. Simple. Thoughtful. Timeless.
+        </p>
+        <div class="hero-buttons">
+          <a href="#gift-menu" class="btn btn-primary btn-lg">Explore Our Gift Menu</a>
+          <a href="#order-form-section" class="btn btn-outline btn-lg">📝 Place an Order</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════
+       OCCASION SPECIALS
+       ════════════════════════════════════════════════════════ -->
+  <section class="occasion-specials section-pad" id="occasion-specials" style="background: var(--pink-softer);">
+    <div class="container text-center">
+      <h2 class="section-title">Occasion Specials</h2>
+      <p class="section-subtitle">Curated bundles for every festival and celebration.</p>
+      <div class="occasion-grid" id="occasion-grid">
+        <!-- Rendered by JS from OCCASION_SPECIALS array -->
+      </div>
+    </div>
+  </section>
+  <!-- ════════════════════════════════════════════════════════
+       3. OUR GIFT MENU
+       ════════════════════════════════════════════════════════ -->
+  <section class="gift-menu section-pad" id="gift-menu">
+    <div class="container text-center">
+      <h2 class="section-title">Our Gift Menu </h2>
+      <p class="section-subtitle">Simple. Thoughtful. Timeless.</p>
+      <div class="products-grid" id="products-grid">
+        <!-- Rendered by JS from PRODUCTS array -->
+      </div>
+      <button id="productsViewMoreBtn" class="btn btn-outline" onclick="toggleProductsView()" style="margin-top:20px;">
+        View More
+      </button>
+    </div>
+  </section>
+
+
+
+  <!-- ════════════════════════════════════════════════════════
+       4. GIFT MEANINGS
+       ════════════════════════════════════════════════════════ -->
+  <section class="gift-meanings section-pad" id="gift-meanings">
+    <div class="container text-center">
+      <h2 class="section-title">Why This Gift?</h2>
+      <p class="section-subtitle">Every gift carries a meaning — discover the thoughtfulness behind each one.</p>
+      <div class="meanings-grid" id="meanings-grid">
+        <!-- Rendered by JS from GIFT_MEANINGS array -->
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════════════════════
+       5. DELIVERY INFORMATION
+       ════════════════════════════════════════════════════════ -->
+  <section class="delivery-info section-pad" id="delivery-info">
+    <div class="container text-center">
+      <h2 class="section-title">Delivery Information</h2>
+      <p class="section-subtitle">We deliver with care, every time.</p>
+      <div class="delivery-list">
+        <div class="delivery-item fade-in">
+          <div class="delivery-item-icon">⚡</div>
+          <div class="delivery-item-text">
+            <h4>Same-Day Delivery</h4>
+            <p>Available in Perth and Sydney for orders placed early in the day.</p>
+          </div>
+        </div>
+        <div class="delivery-item fade-in">
+          <div class="delivery-item-icon">📮</div>
+          <div class="delivery-item-text">
+            <h4>Australia Post</h4>
+            <p>Available for all other cities and states across Australia.</p>
+          </div>
+        </div>
+        <div class="delivery-item fade-in">
+          <div class="delivery-item-icon">📦</div>
+          <div class="delivery-item-text">
+            <h4>Standard Delivery</h4>
+            <p>5–7 business days.</p>
+          </div>
+        </div>
+        <div class="delivery-item fade-in">
+          <div class="delivery-item-icon">🚀</div>
+          <div class="delivery-item-text">
+            <h4>Express Delivery</h4>
+            <p>1–3 business days.</p>
+          </div>
+        </div>
+        <div class="delivery-item fade-in">
+          <div class="delivery-item-text">
+            <h4>Please Note</h4>
+            <p>Delivery estimates are not guaranteed and may vary depending on courier, location, and other factors.</p>
+          </div>
+        </div>
+      </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════════════════════
+       6. DELIVERY GALLERY
+       ════════════════════════════════════════════════════════ -->
+  <section class="delivery-gallery section-pad" id="gallery-section">
+    <div class="container text-center">
+      <h2 class="section-title">Our Deliveries</h2>
+      <p class="section-subtitle">A glimpse at the love we deliver — real orders, real smiles.</p>
+      <div class="gallery-grid" id="gallery-grid">
+        <!-- Rendered by JS from GALLERY_IMAGES array -->
+      </div>
+      <button id="galleryViewMoreBtn" class="btn btn-outline" onclick="toggleGalleryView()" style="margin-top:20px;">
+        View More
+      </button>
+      <div style="margin-top:32px;">
+        <!-- EDIT: Replace '#' with your real Google Review URL -->
+        <a href="https://share.google/Qnisb0OTIyuR5ggJ7" target="_blank" rel="noopener noreferrer"
+          class="btn btn-outline">
+          See More Reviews on Google →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Image preview">
+    <button class="lightbox-close" aria-label="Close">&times;</button>
+    <img id="lightbox-img" src="" alt="">
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════
+       7. ADVANCE BOOKING OFFER
+       ════════════════════════════════════════════════════════ -->
+  <section class="advance-booking section-pad" id="advance-booking">
+    <div class="container text-center">
+      <h2 class="section-title">Advance Booking Offer</h2>
+      <div class="booking-callout fade-in">
+        <h3>Book Early, Get Rewarded!</h3>
+        <p class="offer-highlight">
+          Orders confirmed 20+ days before the delivery date get either
+          <strong>5% off</strong> OR a <strong>Mystery Gift</strong> — customer's choice!
+        </p>
+        <p>Plan ahead and surprise your loved ones with a little extra something special.</p>
+        <p class="small-print">
+          * Applies to eligible orders only. Must be confirmed within the advance booking window.
+          May not be combined with other promotions.
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════════════════════
+       8. CUSTOM / EXTRA ITEM ORDERING
+       ════════════════════════════════════════════════════════ -->
+  <section class="custom-ordering section-pad" id="custom-ordering">
+    <div class="container text-center">
+      <h2 class="section-title">Custom Orders</h2>
+      <p class="section-subtitle">Looking for something special? We've got you covered.</p>
+      <div class="info-cards">
+        <div class="info-card fade-in">
+          <span class="info-card-icon">💬</span>
+          <p>For items not listed on our regular menu, please <strong>consult Gifts by Krivya first</strong> so we can
+            check availability for you.</p>
+        </div>
+        <div class="info-card fade-in">
+          <span class="info-card-icon">🔍</span>
+          <p>Availability must be confirmed before ordering. Some items may require <strong>pre-order</strong> with
+            additional lead time.</p>
+        </div>
+        <div class="info-card fade-in">
+          <span class="info-card-icon">💰</span>
+          <p>A <strong>10% service/customization charge</strong> applies to special sourcing. Additional product and
+            delivery charges may also apply.</p>
+        </div>
+        <div class="info-card fade-in">
+          <span class="info-card-icon">✅</span>
+          <p>A <strong>final quotation</strong> will be provided and must be confirmed by you before any payment is
+            processed.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════════════════════
+       9. PRODUCT AVAILABILITY & SUBSTITUTION POLICY
+       ════════════════════════════════════════════════════════ -->
+  <section class="policy-section section-pad" id="policy-section">
+    <div class="container text-center">
+      <h2 class="section-title">Availability & Substitutions</h2>
+      <p class="section-subtitle">Our commitment to quality stays the same, even when a product changes.</p>
+      <div class="policy-content">
+        <div class="policy-item fade-in">
+          <div class="policy-item-icon">🔄</div>
+          <p>
+            If a specific product is unavailable, a similar item of <strong>equal or greater value</strong> may be
+            provided
+            (e.g., a different chocolate brand, flower variety, decorative item, or packaging element)
+            while maintaining overall quality and value.
+          </p>
+        </div>
+        <div class="policy-item fade-in">
+          <div class="policy-item-icon">🤝</div>
+          <p>
+            If Gifts by Krivya makes an actual error, we take responsibility and work to resolve it
+            promptly and fairly.
+          </p>
+        </div>
+        <div class="policy-item fade-in">
+          <div class="policy-item-icon">📋</div>
+          <p>
+            If a supplier or courier substitutes an approved product due to availability or circumstances
+            outside Gifts by Krivya's control, we are not responsible for exact brand or design variation —
+            provided the replacement is reasonably similar and of equal or greater value.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════════════════════
+       10. ORDER FORM
+       ════════════════════════════════════════════════════════ -->
+  <section class="order-form-section section-pad" id="order-form-section">
+    <div class="container">
+      <div class="text-center">
+        <h2 class="section-title">Place Your Order</h2>
+        <p class="section-subtitle">Fill in the details below and we'll handle the rest with love.</p>
+      </div>
+
+      <div class="order-form-wrapper">
+        <form id="order-form" novalidate autocomplete="on">
+          <!-- Anti-spam honeypot (bots fill this, humans don't) -->
+          <input type="text" name="website_url_hp" id="order-hp" class="hp-trap" tabindex="-1" autocomplete="off"
+            aria-hidden="true">
+
+          <!-- Sender Details -->
+          <h3 class="form-section-title">Sender Details</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="sender-name">Name <span class="required">*</span></label>
+              <input type="text" id="sender-name" name="sender-name" required placeholder="Enter your full name"
+                maxlength="100">
+              <span class="error-msg">Please enter your name.</span>
+            </div>
+            <div class="form-group">
+              <label for="sender-contact">Contact Number <span class="required">*</span></label>
+              <input type="tel" id="sender-contact" name="sender-contact" required placeholder="e.g. +61 4XX XXX XXX"
+                maxlength="30">
+              <span class="error-msg">Please enter your contact number.</span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="sender-country">Country <span class="required">*</span></label>
+              <select id="sender-country" name="sender-country" required>
+                <option value="">— Select country —</option>
+                <option value="Nepal">Nepal</option>
+                <option value="Australia">Australia</option>
+              </select>
+              <span class="error-msg">Please enter your country.</span>
+            </div>
+            <div class="form-group">
+              <label for="sender-email">Email Address<span class="required">*</span></label>
+              <input type="email" id="sender-email" name="sender-email" required placeholder="you@example.com"
+                maxlength="100">
+              <span class="error-msg">Please enter a valid email address.</span>
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="checkbox-row">
+              <input type="checkbox" id="self-receiver-check" onchange="toggleSelfReceiver()">
+              <label for="self-receiver-check">Ordering for Self</label>
+            </div>
+          </div>
+          <!-- Receiver Details -->
+          <h3 class="form-section-title">Receiver Details</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="receiver-name">Full Name <span class="required">*</span></label>
+              <input type="text" id="receiver-name" name="receiver-name" required
+                placeholder="Full name of the recipient" maxlength="100">
+              <span class="error-msg">Please enter the receiver's name.</span>
+            </div>
+            <div class="form-group">
+              <label for="receiver-contact">Contact Number <span class="required">*</span></label>
+              <input type="tel" id="receiver-contact" name="receiver-contact" required
+                placeholder="Receiver's phone number" maxlength="30">
+              <span class="error-msg">Please enter the receiver's contact.</span>
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="form-group">
+              <label for="receiver-email">Email Address <span class="required">*</span></label>
+              <input type="email" id="receiver-email" name="receiver-email" required placeholder="example@gmail.com"
+                maxlength="100">
+              <span class="error-msg">Please enter a valid email address.</span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="receiver-country">Country <span class="required">*</span></label>
+              <select id="receiver-country" name="receiver-country" required>
+                <option value="">— Select country —</option>
+                <option value="Nepal">Nepal</option>
+                <option value="Australia">Australia</option>
+              </select>
+              <span class="error-msg">Please select the country.</span>
+            </div>
+            <div class="form-group">
+              <label for="receiver-city">City / Suburb <span class="required">*</span></label>
+              <input type="text" id="receiver-city" name="receiver-city" required placeholder="e.g. Perth, Sydney"
+                maxlength="100">
+              <span class="error-msg">Please enter the city or suburb.</span>
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="form-group">
+              <label for="receiver-landmark">Landmark / Delivery Instructions</label>
+              <input type="text" id="receiver-landmark" name="receiver-landmark"
+                placeholder="e.g. Near the park, gate code #123, house color" maxlength="255">
+            </div>
+          </div>
+          <div class="form-row full">
+            <p class="form-subsection-title">Secondary Contact Person: <span class="optional-tag">Recommended, in case
+                we
+                can't reach the primary contact</span></p>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="receiver-secondary-name">Secondary Contact Name</label>
+              <input type="text" id="receiver-secondary-name" name="receiver-secondary-name"
+                placeholder="Name of a backup contact" maxlength="100">
+            </div>
+            <div class="form-group">
+              <label for="receiver-secondary-contact">Secondary Contact Number</label>
+              <input type="tel" id="receiver-secondary-contact" name="receiver-secondary-contact"
+                placeholder="Backup phone number" maxlength="30">
+              <span class="error-msg">Please enter a valid phone number.</span>
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="form-group">
+              <label for="receiver-maps-link">Google Maps Pin Link (recommended)</label>
+              <input type="url" id="receiver-maps-link" placeholder="Paste a Google Maps location link here"
+                maxlength="500">
+              <p style="font-size:0.75rem; color:var(--espresso-light); margin-top:4px;">
+                In Google Maps, drop a pin on the exact delivery spot, tap Share, and paste the link here. This helps us
+                find the exact location, especially in larger areas.
+              </p>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+                <button type="button" class="btn btn-outline btn-sm" onclick="useMyLocation()">
+                  📍 Use My Current Location
+                </button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="openMapPicker()">
+                  🗺️ Pick on Map
+                </button>
+              </div>
+              <p id="location-status" style="font-size:0.75rem; color:var(--espresso-light); margin-top:4px;"></p>
+            </div>
+          </div>
+
+          <div class="form-divider"></div>
+
+          <!-- Gift Details -->
+          <h3 class="form-section-title">Gift Details</h3>
+          <div class="form-row full">
+            <div class="form-group" style="margin-bottom: 24px;">
+              <label>Your Cart Items <span class="required">*</span></label>
+              <div id="cart-summary-container" class="cart-summary-container">
+                <!-- Populated by JS -->
+                <p>Your cart is empty. Please select items from the Gift Menu.</p>
+              </div>
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="form-group">
+              <label for="order-occasion">Occasion</label>
+              <select id="order-occasion" name="order-occasion">
+                <option value="">— Select occasion —</option>
+                <!-- Options populated by JS from OCCASIONS array -->
+              </select>
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="form-group">
+              <label for="order-additional">Additional Items</label>
+              <input type="text" id="order-additional" name="order-additional"
+                placeholder="Any extra items you'd like to add?" maxlength="255">
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="form-group">
+              <label for="order-message">Personal Message</label>
+              <textarea id="order-message" name="order-message" rows="3"
+                placeholder="Write a heartfelt message to include with the gift..." maxlength="1000"></textarea>
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="form-group">
+              <label for="order-customization">Customization Details</label>
+              <textarea id="order-customization" name="order-customization" rows="3"
+                placeholder="Any special requests for customization? (e.g., colors, engraving text, photo to print)"
+                maxlength="1000"></textarea>
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="form-group">
+              <label for="order-date">Preferred Delivery Date <span class="required">*</span></label>
+              <input type="date" id="order-date" name="order-date" required>
+              <span class="error-msg">Please choose a delivery date.</span>
+            </div>
+          </div>
+
+          <div class="form-submit-area">
+            <button type="submit" class="btn btn-primary btn-lg" id="order-review-btn">
+              Review My Order
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════════════════════
+       11. ORDER SUMMARY & PAYMENT
+       ════════════════════════════════════════════════════════ -->
+  <section class="order-summary-section section-pad" id="order-summary-section">
+    <div class="container">
+      <div class="text-center">
+        <h2 class="section-title">Order Summary & Payment</h2>
+        <p class="section-subtitle">Review your details and complete your payment.</p>
+      </div>
+      <div class="summary-wrapper" id="summary-content">
+        <!-- Populated dynamically by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════
+       TRACK ORDER SECTION
+       ════════════════════════════════════════════════════════ -->
+  <section class="track-order-section section-pad" id="track-order-section" style="background: var(--pink-softer);">
+    <div class="container text-center">
+      <h2 class="section-title">Track My Order</h2>
+      <p class="section-subtitle">Enter your Parcel ID to check the status of your order.</p>
+
+      <div class="track-order-wrapper fade-in">
+        <form id="tracking-form" onsubmit="event.preventDefault(); window.doTracking();">
+          <input type="text" id="tracking-id" placeholder="e.g. GK-230814-0031" required maxlength="50">
+          <button type="submit" class="btn btn-primary" id="tracking-btn">Check Status</button>
+        </form>
+        <div id="tracking-result" class="tracking-result" style="display:none; margin-top:24px;">
+          <!-- Tracking step logic rendering goes here -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- ════════════════════════════════════════════════════════
+       12. CHANGES AFTER ORDER CONFIRMATION
+       ════════════════════════════════════════════════════════ -->
+  <section class="changes-notice section-pad" id="changes-notice">
+    <div class="container text-center">
+      <h2 class="section-title">Changes After Confirmation</h2>
+      <div class="notice-box fade-in">
+        <p>
+          Once an order has been <strong>confirmed, invoiced, approved, and preparation has started</strong>,
+          it cannot be changed or cancelled except where Gifts by Krivya agrees otherwise.
+          Additional changes may result in <strong>extra charges</strong> and/or <strong>delays</strong>
+          in the delivery timeline.
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════════════════════
+       13. TERMS & CONDITIONS PREVIEW
+       ════════════════════════════════════════════════════════ -->
+  <section class="terms-preview section-pad" id="terms-preview">
+    <div class="container text-center">
+      <h2 class="section-title">Terms & Conditions</h2>
+      <p class="section-subtitle">We believe in transparency and trust. Please review our terms.</p>
+      <a href="terms.html" class="btn btn-primary">📄 View Full Terms & Conditions →</a>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════
+       FRANCHISE & COLLABORATIONS
+       ════════════════════════════════════════════════════════ -->
+  <section class="franchise-section section-pad" id="franchise-section">
+    <div class="container text-center">
+      <h2 class="section-title">Franchise & Collaborations</h2>
+      <p class="section-subtitle">Interested in partnering with Gift by Krivya or opening a franchise in your city? We'd
+        love to hear from you.</p>
+      <div class="franchise-wrapper fade-in">
+        <form id="franchise-form" onsubmit="event.preventDefault(); window.submitFranchise();"
+          style="max-width:600px; margin: 0 auto; text-align: left;">
+          <!-- Anti-spam honeypot -->
+          <input type="text" name="franchise_hp" id="franchise-hp" class="hp-trap" tabindex="-1" autocomplete="off"
+            aria-hidden="true">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="franchise-name" required placeholder="Your Name" maxlength="100">
+          </div>
+          <div class="form-group">
+            <label>Business / City</label>
+            <input type="text" id="franchise-city" required placeholder="City or Business Name" maxlength="100">
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="franchise-email" required placeholder="Your Email" maxlength="100">
+          </div>
+          <div class="form-group">
+            <label>Message</label>
+            <textarea id="franchise-msg" rows="4" required placeholder="Tell us about yourself..."
+              maxlength="1000"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" id="franchise-submit-btn"
+            style="width:100%; justify-content:center;">Submit
+            Inquiry</button>
+
+          <div style="text-align:center; margin-top:20px;">
+            <p style="font-size: 0.9rem;">Or email us directly at:</p>
+            <a href="mailto:giftbykrivya@gmail.com" class="btn btn-outline btn-sm">giftbykrivya@gmail.com</a>
+            <p style="font-size: 0.75rem; color: var(--espresso-light); margin-top:4px;"></p>
+          </div>
+        </form>
+        <div id="franchise-success"
+          style="display:none; text-align:center; margin-top:20px; color: green; font-weight: bold;">
+          Thank you! We have received your inquiry.
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════════════════════
+       14. CUSTOMER REVIEWS
+       ════════════════════════════════════════════════════════ -->
+  <section class="reviews-section section-pad" id="reviews-section">
+    <div class="container text-center">
+      <h2 class="section-title">Customer Reviews</h2>
+      <p class="section-subtitle">What our customers are saying about Gifts by Krivya.</p>
+      <div class="reviews-grid" id="reviews-grid">
+        <!-- Rendered by JS from REVIEWS array -->
+      </div>
+      <div style="margin-top:12px;">
+        <button class="btn btn-gold" onclick="openReviewModal()">
+          Leave Us a Review →
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Review Modal -->
+  <div class="lightbox" id="review-modal" role="dialog" aria-label="Review Form">
+    <div
+      style="background:var(--white); padding:30px; border-radius:12px; max-width:400px; width:90%; position:relative;">
+      <button class="lightbox-close" style="color:var(--espresso); top:10px; right:15px;"
+        onclick="closeReviewModal()">&times;</button>
+      <h3 style="margin-bottom:16px;">Leave a Review</h3>
+      <form id="review-form" onsubmit="event.preventDefault(); window.submitReview();">
+        <!-- Anti-spam honeypot -->
+        <input type="text" name="review_hp" id="review-hp" class="hp-trap" tabindex="-1" autocomplete="off"
+          aria-hidden="true">
+        <div class="form-group" style="margin-bottom:12px;">
+          <input type="text" id="review-name" required placeholder="Your Name" maxlength="100"
+            style="width:100%; padding:10px;">
+        </div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <select id="review-stars" required style="width:100%; padding:10px;">
+            <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
+            <option value="4">⭐⭐⭐⭐ (4/5)</option>
+            <option value="3">⭐⭐⭐ (3/5)</option>
+            <option value="2">⭐⭐ (2/5)</option>
+            <option value="1">⭐ (1/5)</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <textarea id="review-text" rows="4" required placeholder="Your review..." maxlength="1000"
+            style="width:100%; padding:10px;"></textarea>
+        </div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <input type="text" id="review-parcel-id" placeholder="Parcel ID (optional, e.g. GK-260814-1234)"
+            maxlength="50" style="width:100%; padding:10px;">
+        </div>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; cursor:pointer;">
+            <input type="checkbox" id="review-public" checked style="width:auto;">
+            OK to feature this review publicly?
+          </label>
+        </div>
+        <button type="submit" class="btn btn-primary" id="review-submit-btn"
+          style="width:100%; justify-content:center;">Submit Review</button>
+      </form>
+      <div id="review-success" style="display:none; text-align:center; color:green; margin-top:12px;">
+        Thank you for your feedback!
+      </div>
+    </div>
+  </div>
+
+  <!-- Enquiry Modal -->
+  <div class="lightbox" id="enquiry-modal" role="dialog" aria-label="Enquiry Form">
+    <div
+      style="background:var(--white); padding:30px; border-radius:12px; max-width:400px; width:90%; position:relative;">
+      <button class="lightbox-close" style="color:var(--espresso); top:10px; right:15px;"
+        onclick="closeEnquiryModal()">&times;</button>
+      <h3 style="margin-bottom:16px;">Enquire About Product</h3>
+      <p id="enquiry-product-name" style="margin-bottom:16px; font-weight:bold; color:var(--rose-gold);"></p>
+      <form id="enquiry-form" onsubmit="event.preventDefault(); window.submitEnquiry();">
+        <!-- Anti-spam honeypot -->
+        <input type="text" name="enquiry_hp" id="enquiry-hp" class="hp-trap" tabindex="-1" autocomplete="off"
+          aria-hidden="true">
+        <input type="hidden" id="enquiry-pid">
+        <div class="form-group" style="margin-bottom:12px;">
+          <input type="text" id="enquiry-name" required placeholder="Your Name" maxlength="100"
+            style="width:100%; padding:10px;">
+        </div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <input type="email" id="enquiry-email" required placeholder="Your Email" maxlength="100"
+            style="width:100%; padding:10px;">
+        </div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <textarea id="enquiry-msg" rows="4" required placeholder="What would you like to know?" maxlength="1000"
+            style="width:100%; padding:10px;"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" id="enquiry-submit-btn"
+          style="width:100%; justify-content:center;">Submit
+          Enquiry</button>
+      </form>
+      <div id="enquiry-success" style="display:none; text-align:center; color:green; margin-top:12px;">
+        Enquiry sent successfully!
+      </div>
+    </div>
+  </div>
+  <!-- Occasion Package Modal -->
+  <div class="lightbox" id="occasion-modal" role="dialog" aria-label="Occasion Package Details">
+    <div
+      style="background:var(--white); padding:30px; border-radius:12px; max-width:440px; width:90%; position:relative;">
+      <button class="lightbox-close" style="color:var(--espresso); top:10px; right:15px;"
+        onclick="closeOccasionModal()">&times;</button>
+      <h3 id="occasion-modal-name" style="margin-bottom:8px;"></h3>
+      <p id="occasion-modal-teaser" style="color:var(--espresso-light); margin-bottom:16px;"></p>
+      <p style="font-weight:600; margin-bottom:6px;">What's included:</p>
+      <ul id="occasion-modal-items" style="margin:0 0 16px 20px; padding:0;"></ul>
+      <div id="occasion-modal-price"
+        style="font-weight:700; color:var(--rose-gold); font-size:1.2rem; margin-bottom:20px;"></div>
+      <div style="display:flex; gap:8px;">
+        <button id="occasion-modal-add-btn" class="btn btn-primary btn-sm" style="flex:1;">🛒 Add to Order</button>
+        <button id="occasion-modal-enquire-btn" class="btn btn-outline btn-sm" style="flex:1;">💝 Enquire</button>
+      </div>
+    </div>
+  </div>
+  <!-- Map Picker Modal -->
+  <div class="lightbox" id="map-picker-modal" role="dialog" aria-label="Pick delivery location on map">
+    <div
+      style="background:var(--white); padding:24px; border-radius:12px; max-width:600px; width:92%; position:relative;">
+      <button class="lightbox-close" style="color:var(--espresso); top:10px; right:15px;"
+        onclick="closeMapPicker()">&times;</button>
+      <h3 style="margin-bottom:12px;">Pin the Exact Delivery Location</h3>
+      <p style="font-size:0.85rem; color:var(--espresso-light); margin-bottom:14px;">
+        Search for the area, then click or drag the pin to the exact spot.
+      </p>
+
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <input type="text" id="map-search-input" placeholder="Search a place, e.g. Kalimati, Kathmandu"
+          style="flex:1; padding:10px; border:1px solid #ddd; border-radius:8px;"
+          onkeydown="if(event.key==='Enter'){event.preventDefault(); searchMapLocation();}">
+        <button type="button" class="btn btn-outline btn-sm" onclick="searchMapLocation()">Search</button>
+      </div>
+
+      <div id="map-picker-container"
+        style="width:100%; height:340px; border-radius:8px; overflow:hidden; margin-bottom:14px;"></div>
+
+      <p id="map-picker-status" style="font-size:0.8rem; color:var(--espresso-light); margin-bottom:14px;">
+        Click anywhere on the map, or drag the pin, to set the exact spot.
+      </p>
+
+      <div style="display:flex; gap:8px;">
+        <button type="button" class="btn btn-primary" style="flex:1;" onclick="confirmMapLocation()">
+          ✅ Confirm This Location
+        </button>
+        <button type="button" class="btn btn-outline" onclick="closeMapPicker()">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <!-- Cart Drawer -->
+  <div id="cart-drawer-overlay" onclick="closeCartDrawer()"
+    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:998;"></div>
+  <div id="cart-drawer"
+    style="position:fixed; top:0; right:-100%; width:100%; max-width:380px; height:100%; background:var(--white); z-index:999; box-shadow:-4px 0 20px rgba(0,0,0,0.15); display:flex; flex-direction:column; transition:right 0.3s ease;">
+    <div
+      style="padding:20px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="margin:0;">Your Cart 🛒</h3>
+      <button onclick="closeCartDrawer()"
+        style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--espresso);">&times;</button>
+    </div>
+    <div id="cart-drawer-items" style="flex:1; overflow-y:auto; padding:12px 20px;"></div>
+    <div style="padding:20px; border-top:1px solid #eee;">
+      <div
+        style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:14px; color:var(--espresso);">
+        <span>Subtotal</span>
+        <span id="cart-drawer-total"></span>
+      </div>
+      <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="goToCheckoutFromDrawer()">
+        Proceed to Checkout
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       15. FOOTER
+       ════════════════════════════════════════════════════════ -->
+  <footer class="site-footer" id="site-footer">
+    <div class="container">
+
+      <!-- CTA -->
+      <div class="footer-cta">
+        <h2>Ready to make someone smile?</h2>
+        <div class="footer-cta-buttons">
+          <!-- EDIT: Replace the WhatsApp number placeholder -->
+          <a href="https://wa.me/614XXXXXXXX?text=Hi%20Krivya!%20I'd%20like%20to%20place%20an%20order%20🎁"
+            target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-lg" id="footer-whatsapp-btn">
+            💬 Message Us to Order
+          </a>
+          <a href="#order-form-section" class="btn btn-outline btn-lg"
+            style="border-color:rgba(255,255,255,0.3); color:rgba(255,255,255,0.9);">
+            📋 Fill Order Form
+          </a>
+        </div>
+      </div>
+
+      <!-- Info Row -->
+      <div class="footer-info">
+        <div class="footer-info-item">
+          <span>📸</span>
+          <a href="https://www.instagram.com/gifts_by_krivya/" target="_blank"
+            rel="noopener noreferrer">@giftbykrivya</a>
+        </div>
+        <div class="footer-info-item">
+          <span>📧</span>
+          <a href="mailto:giftbykrivya@gmail.com">giftbykrivya@gmail.com</a>
+        </div>
+        <div class="footer-info-item">
+          <span>🌍</span>
+          <span>Worldwide Delivery</span>
+        </div>
+      </div>
+
+      <!-- Bottom -->
+      <div class="footer-bottom">
+        <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:8px;">
+          <img src="images/Logo/giftsbykrivya.jpeg" alt="Gifts by Krivya Logo"
+            style="width:30px; height:30px; border-radius:50%; object-fit:cover; border:1px solid rgba(255,255,255,0.4); cursor:pointer;"
+            title="Click to view logo"
+            onclick="openLightbox('images/Logo/giftsbykrivya.jpeg', 'Gifts by Krivya — Love Across Miles');">
+          <span style="font-family:var(--font-display); font-weight:600; color:var(--white);">Gifts by Krivya</span>
+        </div>
+        <p>Made with 💗 by Gifts by Krivya · Love Across Miles</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll to Top -->
+  <button class="scroll-top-btn" id="scroll-top-btn" aria-label="Scroll to top">↑</button>
+
+  <!-- JavaScript -->
+  <script src="js/script.js"></script>
+</body>
+
+</html>
