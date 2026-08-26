@@ -2025,6 +2025,17 @@ function renderOccasionSpecials() {
   const grid = document.getElementById('occasion-grid');
   if (!grid) return;
 
+  if (!OCCASION_SPECIALS || OCCASION_SPECIALS.length === 0) {
+    grid.innerHTML = `
+      <div class="occasion-coming-soon">
+        <span class="occasion-coming-soon-icon">🎁</span>
+        <h3>Something Special is Coming Soon</h3>
+        <p>We're preparing our next festival gift collection — check back soon!</p>
+      </div>
+    `;
+    return;
+  }
+
   grid.innerHTML = OCCASION_SPECIALS.map(o => {
     const badgeHtml = o.hasIcon
       ? `<span class="badge-star">✨</span><span class="badge-text">${escapeHtml(o.badgeText || 'Featured')}</span>`
