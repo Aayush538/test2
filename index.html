@@ -94,8 +94,7 @@
   </button>
 
   <!-- FLOATING ENQUIRY FAB (mobile only — see .mobile-enquiry-fab in style.css) -->
-  <button id="enquiry-fab" class="mobile-enquiry-fab" onclick="openCollectiveEnquiryModal()"
-    aria-label="Enquire about selected products">
+  <button id="enquiry-fab" class="mobile-enquiry-fab" onclick="openCollectiveEnquiryModal()" aria-label="Enquire about selected products">
     <span class="icon">💝</span>
     <span class="fab-label">Enquire</span>
     <span class="fab-count">0</span>
@@ -820,10 +819,10 @@
   <div id="cart-drawer"
     style="position:fixed; top:0; right:-100%; width:100%; max-width:380px; height:100%; background:var(--white); z-index:999; box-shadow:-4px 0 20px rgba(0,0,0,0.15); display:flex; flex-direction:column; transition:right 0.3s ease;">
     <div
-      style="padding:20px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+      style="padding:14px 16px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; background:var(--white); z-index:2;">
       <h3 style="margin:0;">Your Cart 🛒</h3>
-      <button onclick="closeCartDrawer()"
-        style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--espresso);">&times;</button>
+      <button onclick="closeCartDrawer()" aria-label="Close cart"
+        style="background:var(--pink-softer); border:none; width:36px; height:36px; min-width:36px; border-radius:50%; font-size:1.3rem; cursor:pointer; color:var(--espresso); display:flex; align-items:center; justify-content:center; line-height:1;">&times;</button>
     </div>
     <div id="cart-drawer-items" style="flex:1; overflow-y:auto; padding:12px 20px;"></div>
     <div style="padding:20px; border-top:1px solid #eee;">
