@@ -226,19 +226,6 @@ const OCCASION_SPECIALS = [
       { id: 'tihar-item-2', name: 'PLACEHOLDER — item name', priceAUD: 0, priceNPR: 0, image: 'images/occasion-tihar-item2.jpg' },
     ],
   },
-  {
-    id: 'rakshya-bandhan-special',
-    name: 'Raksha Bandhan Special',
-    teaser: 'A meaningful gift set for Raksha Bandhan',
-    image: 'images/occasion-rakshya-bandhan.jpg',
-    featured: false,
-    badgeText: 'Time Limited',
-    hasIcon: false,
-    packageItems: [
-      { id: 'rb-item-1', name: 'PLACEHOLDER — item name', priceAUD: 0, priceNPR: 0, image: 'images/occasion-rb-item1.jpg' },
-      { id: 'rb-item-2', name: 'PLACEHOLDER — item name', priceAUD: 0, priceNPR: 0, image: 'images/occasion-rb-item2.jpg' },
-    ],
-  },
 ];
 // ──────────────────────────────────────────────────────────────
 // GIFT MEANINGS — Edit or add meanings here
