@@ -510,6 +510,35 @@ h5 {
   margin: 0 auto;
 }
 
+.occasion-coming-soon {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 50px 24px;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.occasion-coming-soon-icon {
+  display: block;
+  font-size: 2.4rem;
+  margin-bottom: 14px;
+}
+
+.occasion-coming-soon h3 {
+  font-family: var(--font-heading);
+  color: var(--espresso);
+  font-size: 1.3rem;
+  margin-bottom: 8px;
+}
+
+.occasion-coming-soon p {
+  color: var(--espresso-light);
+  font-size: 0.95rem;
+  max-width: 380px;
+  margin: 0 auto;
+}
+
 @media (max-width: 900px) {
   .occasion-grid {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
