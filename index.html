@@ -670,9 +670,14 @@
     <div class="container text-center">
       <h2 class="section-title">Customer Reviews</h2>
       <p class="section-subtitle">What our customers are saying about Gifts by Krivya.</p>
-      <div class="reviews-grid" id="reviews-grid">
-        <!-- Rendered by JS from REVIEWS array -->
+      <div class="reviews-carousel-wrapper">
+        <button class="reviews-nav reviews-nav-prev" id="reviews-prev" aria-label="Previous review">&#10094;</button>
+        <div class="reviews-carousel-track" id="reviews-grid">
+          <!-- Rendered by JS from REVIEWS array -->
+        </div>
+        <button class="reviews-nav reviews-nav-next" id="reviews-next" aria-label="Next review">&#10095;</button>
       </div>
+      <div class="reviews-dots" id="reviews-dots"></div>
       <div style="margin-top:12px;">
         <button class="btn btn-gold" onclick="openReviewModal()">
           Leave Us a Review →

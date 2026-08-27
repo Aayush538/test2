@@ -542,6 +542,101 @@ function renderReviews() {
       ${r.isPlaceholder ? '<p class="review-note">— Sample review (replace with real review)</p>' : ''}
     </div>
   `).join('');
+
+  // Mobile carousel setup
+  initReviewsCarousel();
+}
+
+function initReviewsCarousel() {
+  const track = document.getElementById('reviews-grid');
+  const prevBtn = document.getElementById('reviews-prev');
+  const nextBtn = document.getElementById('reviews-next');
+  const dotsContainer = document.getElementById('reviews-dots');
+  if (!track || !prevBtn || !nextBtn || !dotsContainer) return;
+
+  const cards = track.querySelectorAll('.review-card');
+  const totalSlides = cards.length;
+  if (totalSlides === 0) return;
+
+  let currentIndex = 0;
+  let autoplayTimer = null;
+
+  // Create dot indicators
+  dotsContainer.innerHTML = '';
+  for (let i = 0; i < totalSlides; i++) {
+    const dot = document.createElement('button');
+    dot.className = 'reviews-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', `Go to review ${i + 1}`);
+    dot.addEventListener('click', () => goToSlide(i));
+    dotsContainer.appendChild(dot);
+  }
+
+  function goToSlide(index) {
+    currentIndex = index;
+    // Only apply transform on mobile
+    if (window.innerWidth <= 768) {
+      cards.forEach((card) => {
+        card.style.transform = `translateX(-${currentIndex * 100}%)`;
+      });
+    }
+    // Update dots
+    const dots = dotsContainer.querySelectorAll('.reviews-dot');
+    dots.forEach((d, i) => d.classList.toggle('active', i === currentIndex));
+    resetAutoplay();
+  }
+
+  function nextSlide() {
+    goToSlide((currentIndex + 1) % totalSlides);
+  }
+
+  function prevSlide() {
+    goToSlide((currentIndex - 1 + totalSlides) % totalSlides);
+  }
+
+  prevBtn.addEventListener('click', prevSlide);
+  nextBtn.addEventListener('click', nextSlide);
+
+  // Touch/swipe support
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  track.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  track.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) nextSlide();
+      else prevSlide();
+    }
+  }, { passive: true });
+
+  // Auto-rotate every 5 seconds on mobile
+  function startAutoplay() {
+    if (window.innerWidth <= 768) {
+      autoplayTimer = setInterval(nextSlide, 5000);
+    }
+  }
+
+  function resetAutoplay() {
+    clearInterval(autoplayTimer);
+    startAutoplay();
+  }
+
+  startAutoplay();
+
+  // Reset transforms when resizing between mobile/desktop
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+      cards.forEach((card) => { card.style.transform = ''; });
+      clearInterval(autoplayTimer);
+    } else {
+      goToSlide(currentIndex);
+      resetAutoplay();
+    }
+  });
 }
 
 // ============================================================
