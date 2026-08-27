@@ -200,32 +200,6 @@ const PRODUCTS = [
 // purchasable items. Edit names/prices/images when ready.
 // ──────────────────────────────────────────────────────────────
 const OCCASION_SPECIALS = [
-  {
-    id: 'dashain-special',
-    name: 'Dashain Special',
-    teaser: 'Celebrate Dashain with a thoughtful gift bundle',
-    image: 'images/occasion-dashain.jpg',
-    featured: true,
-    badgeText: 'Featured',
-    hasIcon: true,
-    packageItems: [
-      { id: 'dashain-item-1', name: 'PLACEHOLDER — item name', priceAUD: 0, priceNPR: 0, image: 'images/occasion-dashain-item1.jpg' },
-      { id: 'dashain-item-2', name: 'PLACEHOLDER — item name', priceAUD: 0, priceNPR: 0, image: 'images/occasion-dashain-item2.jpg' },
-    ],
-  },
-  {
-    id: 'tihar-special',
-    name: 'Tihar Special',
-    teaser: 'A festive gift set to celebrate Tihar',
-    image: 'images/occasion-tihar.jpg',
-    featured: false,
-    badgeText: 'Festival Offer',
-    hasIcon: false,
-    packageItems: [
-      { id: 'tihar-item-1', name: 'PLACEHOLDER — item name', priceAUD: 0, priceNPR: 0, image: 'images/occasion-tihar-item1.jpg' },
-      { id: 'tihar-item-2', name: 'PLACEHOLDER — item name', priceAUD: 0, priceNPR: 0, image: 'images/occasion-tihar-item2.jpg' },
-    ],
-  },
 ];
 // ──────────────────────────────────────────────────────────────
 // GIFT MEANINGS — Edit or add meanings here
@@ -666,14 +640,14 @@ function getNprPrice(aud, npr) {
 
 function formatPrice(aud, npr) {
   if (currentCurrency === 'NPR') {
-    return `NPR रू ${getNprPrice(aud, npr).toLocaleString('en-IN')}`;
+    return `NPR ${getNprPrice(aud, npr).toLocaleString('en-IN')}`;
   }
   return `AUD $${aud.toFixed(2)}`;
 }
 
 function getProductPrice(product) {
   if (currentCurrency === 'NPR') {
-    return `NPR रू ${getNprPrice(product.priceAUD, product.priceNPR).toLocaleString('en-IN')}`;
+    return `NPR ${getNprPrice(product.priceAUD, product.priceNPR).toLocaleString('en-IN')}`;
   }
   return `AUD $${product.priceAUD.toFixed(2)}`;
 }
@@ -1156,7 +1130,7 @@ function showOrderSummary() {
   if (currency === 'NPR' && totalNpr > 0) {
     orderTotal = totalNpr.toFixed(2);
     advancePaid = totalNpr.toFixed(2); // 100% payment required
-    advanceText = `NPR रू ${advancePaid}`;
+    advanceText = `NPR ${advancePaid}`;
   } else {
     orderTotal = totalAud.toFixed(2);
     advancePaid = totalAud.toFixed(2);
@@ -2025,7 +1999,7 @@ function renderOccasionSpecials() {
   if (!OCCASION_SPECIALS || OCCASION_SPECIALS.length === 0) {
     grid.innerHTML = `
       <div class="occasion-coming-soon">
-        <span class="occasion-coming-soon-icon">🎁</span>
+        <span class="occasion-coming-soon-icon"></span>
         <h3>Something Special is Coming Soon</h3>
         <p>We're preparing our next festival gift collection — check back soon!</p>
       </div>
