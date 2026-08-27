@@ -134,46 +134,7 @@ const PRODUCTS = [
     priceNPR: 0,        // EDIT: Add real NPR price
     image: 'images/Items/perfume.jpeg',
   },
-  {
-    id: 'Teddy1',
-    name: 'Brown Teddy Bear',
-    description: 'Soft, cuddly companion made to be hugged and cherished.',
-    priceAUD: 16.30,
-    priceNPR: 0,        // EDIT: Add real NPR price
-    image: 'images/Items/brownteddy.jpeg',
-  },
-  {
-    id: 'Teddy2',
-    name: 'Fluffy Teddy Bear',
-    description: 'Soft, cuddly companion made to be hugged and cherished.',
-    priceAUD: 16.30,
-    priceNPR: 0,        // EDIT: Add real NPR price
-    image: 'images/Items/teddy2.jpeg',
-  },
-  {
-    id: 'Teddy3',
-    name: 'Honey Teddy Bear',
-    description: 'Soft, cuddly companion made to be hugged and cherished.',
-    priceAUD: 16.30,
-    priceNPR: 0,        // EDIT: Add real NPR price
-    image: 'images/Items/teddy3.jpeg',
-  },
-  {
-    id: 'Teddy4',
-    name: 'Sweet Teddy Bear',
-    description: 'Soft, cuddly companion made to be hugged and cherished.',
-    priceAUD: 16.30,
-    priceNPR: 0,        // EDIT: Add real NPR price
-    image: 'images/Items/teddy4.jpeg',
-  },
-  {
-    id: 'Teddy5',
-    name: 'White Teddy Bear',
-    description: 'Soft, cuddly companion made to be hugged and cherished.',
-    priceAUD: 16.30,
-    priceNPR: 0,        // EDIT: Add real NPR price
-    image: 'images/Items/whiteteddy.jpeg',
-  },
+
   {
     id: 'Lucky Keyring',
     name: 'Lucky Evil Eye Keyring',
@@ -189,6 +150,15 @@ const PRODUCTS = [
     priceAUD: 5.40,
     priceNPR: 0,        // EDIT: Add real NPR price
     image: 'images/Items/Wax.jpeg',
+  },
+  {
+    id: 'Teddy Bear',
+    name: 'Teddy Bear',
+    description: 'Soft, cuddly companion made to be hugged and cherished.',
+    priceAUD: 16.30,
+    priceNPR: 0,        // EDIT: Add real NPR price
+    image: 'images/Items/whiteteddy.jpeg',
+    images: ['images/Items/teddy4.jpeg', 'images/Items/teddy3.jpeg', 'images/Items/teddy2.jpeg', 'images/Items/brownteddy.jpeg'], // Example multiple images
   },
 ];
 // ──────────────────────────────────────────────────────────────
@@ -265,8 +235,8 @@ const GALLERY_IMAGES = [
 const REVIEWS = [
   {
     stars: 5,
-    text: 'Sending gifts from far away always scared me — will it reach on special day? But they took my worry away. I sent a money bouquet with chocolates to my sister in Nepal for her special day. She sent me videos smiling with surprises. You didn\u2019t just deliver gift, you delivered my hug, my love, my presence. Thank you for being the bridge between sisters who miss each other.',
-    author: 'devi benj',
+    text: 'Loved the way they cooperate and make the customer feel easy about everything',
+    author: 'Karuna Silwal',
     isPlaceholder: false,
   },
   {
@@ -402,16 +372,35 @@ function renderProducts() {
 
   grid.innerHTML = productsToShow.map(p => {
     try {
-      const safeImage = p.image || 'images/product-placeholder.jpg';
+      const hasMultipleImages = Array.isArray(p.images) && p.images.length > 1;
+      const imagesArray = hasMultipleImages ? p.images : [p.image || 'images/product-placeholder.jpg'];
       const safeName = p.name || 'Unnamed Product';
       const safeDescription = p.description || '';
 
-      return `
-        <article class="product-card fade-in" data-product-id="${escapeHtml(p.id)}" onclick="handleProductCardClick(event, '${escapeHtml(p.id)}')">
+      let imageHtml = '';
+      if (hasMultipleImages) {
+        imageHtml = `
+          <div class="product-image-carousel" onclick="event.stopPropagation()">
+            <button class="product-image-nav prev" onclick="scrollProductImage(event, '${escapeHtml(p.id)}', -1)">&#10094;</button>
+            <div class="product-image-track" id="img-track-${escapeHtml(p.id)}">
+              ${imagesArray.map(img => `<img src="${escapeHtml(img)}" alt="${escapeHtml(safeName)}" onclick="openLightbox('${escapeHtml(img)}', '${escapeHtml(safeName)}')">`).join('')}
+            </div>
+            <button class="product-image-nav next" onclick="scrollProductImage(event, '${escapeHtml(p.id)}', 1)">&#10095;</button>
+          </div>
+        `;
+      } else {
+        const safeImage = imagesArray[0];
+        imageHtml = `
           <div class="product-card-img-wrap" onclick="openLightbox('${escapeHtml(safeImage)}', '${escapeHtml(safeName)}')">
             <img src="${escapeHtml(safeImage)}" alt="${escapeHtml(safeName)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
             <span class="placeholder-label" style="display:none;">📷 ${escapeHtml(safeImage.split('/').pop())}<br>Drop your photo here</span>
           </div>
+        `;
+      }
+
+      return `
+        <article class="product-card fade-in" data-product-id="${escapeHtml(p.id)}" onclick="handleProductCardClick(event, '${escapeHtml(p.id)}')">
+          ${imageHtml}
           <div class="product-card-body">
             <div>
               <h3 class="product-card-name">${escapeHtml(safeName)}</h3>
@@ -468,6 +457,16 @@ function toggleProductsView() {
     document.getElementById('gift-menu').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
+
+window.scrollProductImage = function (event, productId, direction) {
+  event.preventDefault();
+  event.stopPropagation();
+  const track = document.getElementById('img-track-' + productId);
+  if (track) {
+    const cardWidth = track.clientWidth;
+    track.scrollBy({ left: direction * cardWidth, behavior: 'smooth' });
+  }
+};
 
 // ============================================================
 // RENDER: Gift Meanings
@@ -535,7 +534,7 @@ function renderReviews() {
   const grid = document.getElementById('reviews-grid');
   if (!grid) return;
   grid.innerHTML = REVIEWS.map(r => `
-    <div class="review-card fade-in">
+    <div class="review-card">
       <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</div>
       <p class="review-text">${escapeHtml(r.text)}</p>
       <p class="review-author">${escapeHtml(r.author)}</p>
@@ -573,13 +572,10 @@ function initReviewsCarousel() {
 
   function goToSlide(index) {
     currentIndex = index;
-    // Only apply transform on mobile
     if (window.innerWidth <= 768) {
-      cards.forEach((card) => {
-        card.style.transform = `translateX(-${currentIndex * 100}%)`;
-      });
+      const cardWidth = track.clientWidth;
+      track.scrollTo({ left: cardWidth * currentIndex, behavior: 'smooth' });
     }
-    // Update dots
     const dots = dotsContainer.querySelectorAll('.reviews-dot');
     dots.forEach((d, i) => d.classList.toggle('active', i === currentIndex));
     resetAutoplay();
@@ -596,23 +592,6 @@ function initReviewsCarousel() {
   prevBtn.addEventListener('click', prevSlide);
   nextBtn.addEventListener('click', nextSlide);
 
-  // Touch/swipe support
-  let touchStartX = 0;
-  let touchEndX = 0;
-
-  track.addEventListener('touchstart', (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-  }, { passive: true });
-
-  track.addEventListener('touchend', (e) => {
-    touchEndX = e.changedTouches[0].screenX;
-    const diff = touchStartX - touchEndX;
-    if (Math.abs(diff) > 50) {
-      if (diff > 0) nextSlide();
-      else prevSlide();
-    }
-  }, { passive: true });
-
   // Auto-rotate every 5 seconds on mobile
   function startAutoplay() {
     if (window.innerWidth <= 768) {
@@ -625,15 +604,28 @@ function initReviewsCarousel() {
     startAutoplay();
   }
 
+  // Update currentIndex on manual scroll/swipe
+  track.addEventListener('scroll', () => {
+    if (window.innerWidth <= 768) {
+      const cardWidth = track.clientWidth;
+      if (cardWidth > 0) {
+        const index = Math.round(track.scrollLeft / cardWidth);
+        if (index !== currentIndex && index >= 0 && index < totalSlides) {
+          currentIndex = index;
+          const dots = dotsContainer.querySelectorAll('.reviews-dot');
+          dots.forEach((d, i) => d.classList.toggle('active', i === currentIndex));
+        }
+      }
+    }
+  }, { passive: true });
+
   startAutoplay();
 
-  // Reset transforms when resizing between mobile/desktop
+  // Reset when resizing between mobile/desktop
   window.addEventListener('resize', () => {
     if (window.innerWidth > 768) {
-      cards.forEach((card) => { card.style.transform = ''; });
       clearInterval(autoplayTimer);
     } else {
-      goToSlide(currentIndex);
       resetAutoplay();
     }
   });
