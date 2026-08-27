@@ -513,7 +513,7 @@ h5 {
 .occasion-coming-soon {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 50px 24px;
+  padding: 40px 24px;
   background: var(--white);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
