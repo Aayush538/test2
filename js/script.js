@@ -291,21 +291,21 @@ const GALLERY_IMAGES = [
 const REVIEWS = [
   {
     stars: 5,
-    text: 'The gift arrived beautifully wrapped and on time. My sister in Sydney was so surprised! Absolutely recommend Gifts by Krivya.',
-    author: 'Sample Reviewer 1',
-    isPlaceholder: true,  // EDIT: Set to false or remove when this is a real review
+    text: 'Sending gifts from far away always scared me — will it reach on special day? But they took my worry away. I sent a money bouquet with chocolates to my sister in Nepal for her special day. She sent me videos smiling with surprises. You didn\u2019t just deliver gift, you delivered my hug, my love, my presence. Thank you for being the bridge between sisters who miss each other.',
+    author: 'devi benj',
+    isPlaceholder: false,
   },
   {
     stars: 5,
-    text: 'Krivya made the whole process so easy. From ordering to delivery, everything was smooth and the quality was amazing.',
-    author: 'Sample Reviewer 2',
-    isPlaceholder: true,
+    text: 'If you want to send gifts abroad from Nepal, this is the right place — best service, and good communication, easy payment ways.',
+    author: 'Krishna Shrestha',
+    isPlaceholder: false,
   },
   {
     stars: 5,
-    text: 'I was worried about sending a gift internationally but they handled everything perfectly. Will definitely order again!',
-    author: 'Sample Reviewer 3',
-    isPlaceholder: true,
+    text: 'Excellent service, on-time delivery, and a wonderful experience. Highly recommended!',
+    author: 'Suhana Khyen',
+    isPlaceholder: false,
   },
 ];
 
@@ -410,6 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateCartBadge();
   renderCartInForm();
   updateFormPlaceholders(currentCurrency);
+  updateDeliveryInfoText(currentCurrency);
 });
 
 // ============================================================
@@ -633,6 +634,7 @@ function initCurrencyToggle() {
 function setCurrency(currency) {
   currentCurrency = currency;
   updateFormPlaceholders(currency);
+  updateDeliveryInfoText(currency);
   document.getElementById('curr-aud').classList.toggle('active', currency === 'AUD');
   document.getElementById('curr-npr').classList.toggle('active', currency === 'NPR');
 
@@ -648,22 +650,30 @@ function setCurrency(currency) {
   updateSummaryTotal();
 }
 
+// ──────────────────────────────────────────────────────────────
+// NPR CONVERSION — used whenever a specific NPR price hasn't been
+// manually entered (priceNPR left at 0). If you ever want to set a
+// real, different NPR price for a specific product, just fill in its
+// priceNPR value directly — that manual value always takes priority
+// over this auto-conversion.
+// ──────────────────────────────────────────────────────────────
+const NPR_CONVERSION_RATE = 109.67;
+
+function getNprPrice(aud, npr) {
+  const value = (npr && npr > 0) ? npr : (aud || 0) * NPR_CONVERSION_RATE;
+  return Math.round(value); // whole rupees, no decimals
+}
+
 function formatPrice(aud, npr) {
   if (currentCurrency === 'NPR') {
-    if (npr > 0) {
-      return `NPR रू ${npr.toFixed(2)}`;
-    }
-    return 'NPR price to be added';
+    return `NPR रू ${getNprPrice(aud, npr).toLocaleString('en-IN')}`;
   }
   return `AUD $${aud.toFixed(2)}`;
 }
 
 function getProductPrice(product) {
-  if (currentCurrency === 'NPR' && product.priceNPR > 0) {
-    return `NPR रू ${product.priceNPR.toFixed(2)}`;
-  }
   if (currentCurrency === 'NPR') {
-    return 'NPR price to be added';
+    return `NPR रू ${getNprPrice(product.priceAUD, product.priceNPR).toLocaleString('en-IN')}`;
   }
   return `AUD $${product.priceAUD.toFixed(2)}`;
 }
@@ -726,7 +736,7 @@ function renderCartInForm() {
 
   const html = cart.map(item => {
     totalAud += item.priceAUD * item.qty;
-    totalNpr += item.priceNPR * item.qty;
+    totalNpr += getNprPrice(item.priceAUD, item.priceNPR) * item.qty;
     return `
       <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:8px; margin-bottom:8px; border-bottom:1px solid #eee;">
         <div>
@@ -2152,7 +2162,7 @@ function renderCartDrawer() {
 
   container.innerHTML = cart.map(item => {
     totalAud += item.priceAUD * item.qty;
-    totalNpr += item.priceNPR * item.qty;
+    totalNpr += getNprPrice(item.priceAUD, item.priceNPR) * item.qty;
     return `
       <div style="display:flex; gap:12px; align-items:center; padding:12px 0; border-bottom:1px solid #eee;">
         <div style="width:56px; height:56px; border-radius:8px; flex-shrink:0; background:var(--pink-softer); display:flex; align-items:center; justify-content:center; overflow:hidden;">
@@ -2359,6 +2369,29 @@ function syncSelfReceiverFields() {
   if (rContact && sContact) rContact.value = sContact.value;
   if (rEmail && sEmail) rEmail.value = sEmail.value;
   if (rCountry && sCountry) rCountry.value = sCountry.value;
+}
+
+function updateDeliveryInfoText(currency) {
+  const isNPR = currency === 'NPR';
+
+  const sameDay = document.getElementById('delivery-samedaytext');
+  if (sameDay) {
+    sameDay.textContent = isNPR
+      ? 'Available in Ringroad for orders placed early in the day.'
+      : 'Available in Perth and Sydney for orders placed early in the day.';
+  }
+
+  const postTitle = document.getElementById('delivery-posttitle');
+  if (postTitle) {
+    postTitle.textContent = isNPR ? 'Nepal Post' : 'Australia Post';
+  }
+
+  const postText = document.getElementById('delivery-posttext');
+  if (postText) {
+    postText.textContent = isNPR
+      ? 'Available for all other cities and states across Nepal.'
+      : 'Available for all other cities and states across Australia.';
+  }
 }
 
 function updateFormPlaceholders(currency) {

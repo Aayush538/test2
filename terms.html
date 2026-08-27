@@ -21,8 +21,8 @@
   <header class="site-header" id="site-header">
     <div class="container header-inner">
       <div class="header-brand">
-        <img src="images/Logo/giftsbykrivya.jpeg" alt="Gifts by Krivya Logo" class="header-logo"
-          style="cursor:pointer;" title="Click to view logo"
+        <img src="images/Logo/giftsbykrivya.jpeg" alt="Gifts by Krivya Logo" class="header-logo" style="cursor:pointer;"
+          title="Click to view logo"
           onclick="event.preventDefault(); event.stopPropagation(); openLightbox('images/Logo/giftsbykrivya.jpeg', 'Gifts by Krivya — Love Across Miles', true);">
         <a href="index.html" class="header-brand-text" aria-label="Gifts by Krivya Home">
           <span class="header-brand-name">Gifts by Krivya</span>
@@ -54,7 +54,6 @@
 
         <!-- 1 -->
         <div class="term-card">
-          <div class="term-card-icon">📋</div>
           <div class="term-card-content">
             <h4>1. Order Confirmation</h4>
             <p>
@@ -66,7 +65,7 @@
 
         <!-- 2 -->
         <div class="term-card">
-          <div class="term-card-icon">💳</div>
+
           <div class="term-card-content">
             <h4>2. Cancellation & Refund Policy</h4>
             <p>
@@ -79,7 +78,6 @@
 
         <!-- 3 -->
         <div class="term-card">
-          <div class="term-card-icon">👤</div>
           <div class="term-card-content">
             <h4>3. Customer Information</h4>
             <p>
@@ -92,7 +90,6 @@
 
         <!-- 4 -->
         <div class="term-card">
-          <div class="term-card-icon">🕐</div>
           <div class="term-card-content">
             <h4>4. Delivery Timeframes</h4>
             <p>
@@ -107,7 +104,6 @@
 
         <!-- 5 -->
         <div class="term-card">
-          <div class="term-card-icon">🚚</div>
           <div class="term-card-content">
             <h4>5. Courier & Postal Delays</h4>
             <p>
@@ -120,7 +116,6 @@
 
         <!-- 6 -->
         <div class="term-card">
-          <div class="term-card-icon">🔄</div>
           <div class="term-card-content">
             <h4>6. Product Substitutions</h4>
             <p>
@@ -132,7 +127,6 @@
 
         <!-- 7 -->
         <div class="term-card">
-          <div class="term-card-icon">✨</div>
           <div class="term-card-content">
             <h4>7. Personalized & Custom Orders</h4>
             <p>
@@ -145,7 +139,6 @@
 
         <!-- 8 -->
         <div class="term-card">
-          <div class="term-card-icon">🌏</div>
           <div class="term-card-content">
             <h4>8. International Deliveries</h4>
             <p>
@@ -158,7 +151,6 @@
 
         <!-- 9 -->
         <div class="term-card">
-          <div class="term-card-icon">📷</div>
           <div class="term-card-content">
             <h4>9. Privacy & Marketing</h4>
             <p>
@@ -170,7 +162,6 @@
 
         <!-- 10 -->
         <div class="term-card">
-          <div class="term-card-icon">💗</div>
           <div class="term-card-content">
             <h4>10. Acceptance of Terms</h4>
             <p>
@@ -206,7 +197,8 @@
   </div>
 
   <!-- LIGHTBOX MODAL -->
-  <div class="lightbox" id="lightbox" role="dialog" aria-label="Image preview" onclick="if(event.target===this) closeLightbox();">
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Image preview"
+    onclick="if(event.target===this) closeLightbox();">
     <button class="lightbox-close" aria-label="Close image preview" onclick="closeLightbox()">&times;</button>
     <img id="lightbox-img" src="" alt="">
   </div>
