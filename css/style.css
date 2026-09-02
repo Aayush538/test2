@@ -804,8 +804,13 @@ h5 {
   border-color: var(--white);
 }
 
-.product-image-nav.prev { left: 8px; }
-.product-image-nav.next { right: 8px; }
+.product-image-nav.prev {
+  left: 8px;
+}
+
+.product-image-nav.next {
+  right: 8px;
+}
 
 .product-card-body {
   padding: 14px 16px 18px;
@@ -1083,6 +1088,100 @@ h5 {
 .lightbox-close:hover {
   background: rgba(255, 255, 255, 0.35);
   transform: scale(1.1);
+}
+
+/* Lightbox Gallery Navigation */
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.88);
+  border: 2px dotted var(--rose-gold);
+  color: var(--rose-gold);
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2010;
+  transition: all var(--transition);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
+.lightbox-nav:hover {
+  background: var(--rose-gold);
+  color: var(--white);
+  border: 2px solid var(--white);
+  transform: translateY(-50%) scale(1.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.lightbox-nav-prev {
+  left: max(16px, 4vw);
+}
+
+.lightbox-nav-next {
+  right: max(16px, 4vw);
+}
+
+.lightbox-dots {
+  position: absolute;
+  bottom: max(18px, 3vh);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 2010;
+}
+
+.lightbox-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.lightbox-dot:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.lightbox-dot.active {
+  background: var(--rose-gold);
+  border-color: var(--white);
+  transform: scale(1.25);
+  box-shadow: 0 0 8px rgba(247, 201, 216, 0.5);
+}
+
+@media (max-width: 600px) {
+  .lightbox-nav {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
+  .lightbox-nav-prev {
+    left: 6px;
+  }
+
+  .lightbox-nav-next {
+    right: 6px;
+  }
+
+  .lightbox-dots {
+    bottom: 12px;
+    gap: 8px;
+  }
+
+  .lightbox-dot {
+    width: 8px;
+    height: 8px;
+  }
 }
 
 /* ============================================================

@@ -246,7 +246,10 @@
   <!-- Lightbox -->
   <div class="lightbox" id="lightbox" role="dialog" aria-label="Image preview">
     <button class="lightbox-close" aria-label="Close">&times;</button>
+    <button class="lightbox-nav lightbox-nav-prev" id="lightbox-prev" aria-label="Previous image" style="display:none;">&#10094;</button>
     <img id="lightbox-img" src="" alt="">
+    <button class="lightbox-nav lightbox-nav-next" id="lightbox-next" aria-label="Next image" style="display:none;">&#10095;</button>
+    <div class="lightbox-dots" id="lightbox-dots" style="display:none;"></div>
   </div>
 
 
@@ -432,21 +435,26 @@
               <span class="error-msg">Please select the country.</span>
             </div>
             <div class="form-group">
-              <label for="receiver-state">State / Territory</label>
-              <input type="text" id="receiver-state" name="receiver-state" placeholder="e.g. Bagmati Province, WA"
-                maxlength="100">
+              <label for="receiver-state">State / Territory <span class="required conditional-required" id="state-required-star" style="display:none;">*</span></label>
+              <select id="receiver-state" name="receiver-state">
+                <option value="">— Select state / territory —</option>
+              </select>
+              <span class="error-msg">Please select the state or territory.</span>
             </div>
 
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="receiver-postal">Postal Code</label>
+              <label for="receiver-postal">Postal Code <span class="required conditional-required" id="postal-required-star" style="display:none;">*</span></label>
               <input type="text" id="receiver-postal" name="receiver-postal" placeholder="e.g. 44600" maxlength="20">
+              <span class="error-msg">Please enter the postal code.</span>
             </div>
             <div class="form-group">
               <label for="receiver-city">City / Suburb <span class="required">*</span></label>
-              <input type="text" id="receiver-city" name="receiver-city" required placeholder="e.g. Perth, Sydney"
-                maxlength="100">
+              <select id="receiver-city" name="receiver-city" required>
+                <option value="">— Select city / suburb —</option>
+              </select>
+              <input type="text" id="receiver-city-other" name="receiver-city-other" placeholder="Type your city / suburb" maxlength="100" style="display:none; margin-top:8px;">
               <span class="error-msg">Please enter the city or suburb.</span>
             </div>
           </div>

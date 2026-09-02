@@ -310,6 +310,51 @@ const OCCASIONS = [
    ╚════════════════════════════════════════════════════════════╝
    ============================================================ */
 
+// ──────────────────────────────────────────────────────────────
+// LOCATION DATA — States/Provinces and Cities for dropdowns
+// ──────────────────────────────────────────────────────────────
+const AUSTRALIA_STATES = [
+  { value: 'ACT', label: 'Australian Capital Territory (ACT)' },
+  { value: 'NSW', label: 'New South Wales (NSW)' },
+  { value: 'NT', label: 'Northern Territory (NT)' },
+  { value: 'QLD', label: 'Queensland (QLD)' },
+  { value: 'SA', label: 'South Australia (SA)' },
+  { value: 'TAS', label: 'Tasmania (TAS)' },
+  { value: 'VIC', label: 'Victoria (VIC)' },
+  { value: 'WA', label: 'Western Australia (WA)' },
+];
+
+const NEPAL_PROVINCES = [
+  { value: 'Koshi', label: 'Koshi Province' },
+  { value: 'Madhesh', label: 'Madhesh Province' },
+  { value: 'Bagmati', label: 'Bagmati Province' },
+  { value: 'Gandaki', label: 'Gandaki Province' },
+  { value: 'Lumbini', label: 'Lumbini Province' },
+  { value: 'Karnali', label: 'Karnali Province' },
+  { value: 'Sudurpashchim', label: 'Sudurpashchim Province' },
+];
+
+const AUSTRALIA_CITIES = {
+  'ACT': ['Canberra', 'Belconnen', 'Woden Valley', 'Tuggeranong', 'Gungahlin'],
+  'NSW': ['Sydney', 'Parramatta', 'Newcastle', 'Wollongong', 'Central Coast', 'Penrith', 'Liverpool', 'Blacktown', 'Campbelltown', 'Bankstown'],
+  'NT': ['Darwin', 'Alice Springs', 'Palmerston', 'Katherine'],
+  'QLD': ['Brisbane', 'Gold Coast', 'Sunshine Coast', 'Cairns', 'Townsville', 'Toowoomba', 'Mackay', 'Rockhampton', 'Ipswich', 'Logan'],
+  'SA': ['Adelaide', 'Mount Gambier', 'Gawler', 'Whyalla', 'Murray Bridge', 'Port Augusta'],
+  'TAS': ['Hobart', 'Launceston', 'Devonport', 'Burnie', 'Kingston'],
+  'VIC': ['Melbourne', 'Geelong', 'Ballarat', 'Bendigo', 'Dandenong', 'Frankston', 'Shepparton', 'Mildura', 'Cranbourne', 'Werribee'],
+  'WA': ['Perth', 'Fremantle', 'Mandurah', 'Bunbury', 'Rockingham', 'Joondalup', 'Armadale', 'Geraldton', 'Kalgoorlie', 'Albany'],
+};
+
+const NEPAL_CITIES = {
+  'Koshi': ['Biratnagar', 'Dharan', 'Itahari', 'Damak', 'Birtamod', 'Inaruwa', 'Ilam'],
+  'Madhesh': ['Janakpur', 'Birgunj', 'Rajbiraj', 'Kalaiya', 'Gaur', 'Lahan', 'Malangwa'],
+  'Bagmati': ['Kathmandu', 'Lalitpur', 'Bhaktapur', 'Kirtipur', 'Madhyapur Thimi', 'Hetauda', 'Bidur', 'Dhulikhel'],
+  'Gandaki': ['Pokhara', 'Gorkha', 'Damauli', 'Baglung', 'Besisahar', 'Waling'],
+  'Lumbini': ['Butwal', 'Siddharthanagar', 'Nepalgunj', 'Tulsipur', 'Ghorahi', 'Tansen', 'Kapilvastu'],
+  'Karnali': ['Birendranagar', 'Jumla', 'Dailekh', 'Narayan Municipality'],
+  'Sudurpashchim': ['Dhangadhi', 'Mahendranagar', 'Tikapur', 'Amargadhi', 'Dipayal'],
+};
+
 // ── STATE ──
 let currentCurrency = 'AUD';
 let selectedProduct = null;
@@ -361,6 +406,11 @@ function isMobileView() {
   return window.innerWidth <= 768;
 }
 
+// ── LIGHTBOX GALLERY STATE ──
+let currentLightboxImages = [];
+let currentLightboxIndex = 0;
+let currentLightboxAlt = '';
+
 // ── INIT ──
 document.addEventListener('DOMContentLoaded', () => {
   renderProducts();
@@ -378,6 +428,8 @@ document.addEventListener('DOMContentLoaded', () => {
   checkPreSelectedProduct();
   updateCartBadge();
   renderCartInForm();
+  populateLocationDropdowns();
+  updateConditionalRequiredFields();
   updateFormPlaceholders(currentCurrency);
   updateDeliveryInfoText(currentCurrency);
 });
@@ -408,7 +460,7 @@ function renderProducts() {
           <div class="product-image-carousel" onclick="event.stopPropagation()">
             <button class="product-image-nav prev" onclick="scrollProductImage(event, '${escapeHtml(p.id)}', -1)">&#10094;</button>
             <div class="product-image-track" id="img-track-${escapeHtml(p.id)}">
-              ${imagesArray.map(img => `<img src="${escapeHtml(img)}" alt="${escapeHtml(safeName)}" onclick="openLightbox('${escapeHtml(img)}', '${escapeHtml(safeName)}')">`).join('')}
+              ${imagesArray.map((img, idx) => `<img src="${escapeHtml(img)}" alt="${escapeHtml(safeName)}" onclick="openProductLightbox('${escapeHtml(p.id)}', ${idx})">`).join('')}
             </div>
             <button class="product-image-nav next" onclick="scrollProductImage(event, '${escapeHtml(p.id)}', 1)">&#10095;</button>
           </div>
@@ -416,7 +468,7 @@ function renderProducts() {
       } else {
         const safeImage = imagesArray[0];
         imageHtml = `
-          <div class="product-card-img-wrap" onclick="openLightbox('${escapeHtml(safeImage)}', '${escapeHtml(safeName)}')">
+          <div class="product-card-img-wrap" onclick="openProductLightbox('${escapeHtml(p.id)}', 0)">
             <img src="${escapeHtml(safeImage)}" alt="${escapeHtml(safeName)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
             <span class="placeholder-label" style="display:none;">📷 ${escapeHtml(safeImage.split('/').pop())}<br>Drop your photo here</span>
           </div>
@@ -724,6 +776,14 @@ function setCurrency(currency) {
   document.getElementById('curr-aud').classList.toggle('active', currency === 'AUD');
   document.getElementById('curr-npr').classList.toggle('active', currency === 'NPR');
 
+  // Sync receiver country dropdown with currency
+  const rCountry = document.getElementById('receiver-country');
+  if (rCountry) {
+    rCountry.value = (currency === 'NPR') ? 'Nepal' : 'Australia';
+  }
+  populateLocationDropdowns((currency === 'NPR') ? 'Nepal' : 'Australia');
+  updateConditionalRequiredFields();
+
   // Update all prices on the page
   document.querySelectorAll('.product-card-price').forEach(el => {
     const aud = parseFloat(el.dataset.aud);
@@ -962,6 +1022,61 @@ function initForm() {
 
   setMinDeliveryDate();
 
+  // Location dropdown change listeners
+  const rCountry = document.getElementById('receiver-country');
+  const rState = document.getElementById('receiver-state');
+  const rCity = document.getElementById('receiver-city');
+  const rCityOther = document.getElementById('receiver-city-other');
+  const mapsInput = document.getElementById('receiver-maps-link');
+
+  if (rCountry) {
+    rCountry.addEventListener('change', () => {
+      populateLocationDropdowns(rCountry.value);
+      updateConditionalRequiredFields();
+    });
+  }
+
+  if (rState) {
+    rState.addEventListener('change', () => {
+      const country = (rCountry ? rCountry.value : '') || (currentCurrency === 'NPR' ? 'Nepal' : 'Australia');
+      populateCityDropdown(country, rState.value);
+      if (rState.value.trim() && rState.closest('.form-group')) {
+        rState.closest('.form-group').classList.remove('has-error');
+      }
+    });
+  }
+
+  if (rCity) {
+    rCity.addEventListener('change', () => {
+      if (rCityOther) {
+        if (rCity.value === 'OTHER') {
+          rCityOther.style.display = 'block';
+          rCityOther.focus();
+        } else {
+          rCityOther.style.display = 'none';
+          rCityOther.value = '';
+        }
+      }
+      if (rCity.value.trim() && rCity.value !== 'OTHER' && rCity.closest('.form-group')) {
+        rCity.closest('.form-group').classList.remove('has-error');
+      }
+    });
+  }
+
+  if (rCityOther) {
+    rCityOther.addEventListener('input', () => {
+      if (rCityOther.value.trim() && rCityOther.closest('.form-group')) {
+        rCityOther.closest('.form-group').classList.remove('has-error');
+      }
+    });
+  }
+
+  if (mapsInput) {
+    mapsInput.addEventListener('input', () => {
+      updateConditionalRequiredFields();
+    });
+  }
+
   // Attach live validation on email inputs
   ['sender-email', 'receiver-email', 'receiver-secondary-email', 'franchise-email', 'enquiry-email'].forEach(id => {
     const input = document.getElementById(id);
@@ -1033,7 +1148,7 @@ function initForm() {
     }
   });
 }
-// ← add this whole new function anywhere nearby
+
 function setMinDeliveryDate() {
   const dateInput = document.getElementById('order-date');
   if (!dateInput) return;
@@ -1056,6 +1171,7 @@ function validateForm() {
   const emailPhoneIds = [
     'sender-email', 'receiver-email', 'receiver-secondary-email',
     'sender-contact', 'receiver-contact', 'receiver-secondary-contact',
+    'receiver-city', 'receiver-city-other', 'receiver-state', 'receiver-postal'
   ];
 
   const required = document.querySelectorAll('#order-form [required]');
@@ -1069,6 +1185,58 @@ function validateForm() {
       if (group) group.classList.remove('has-error');
     }
   });
+
+  // ── Receiver State & Postal Code (Conditional Validation) ──
+  const mapsLinkInput = document.getElementById('receiver-maps-link');
+  const stateSelect = document.getElementById('receiver-state');
+  const postalInput = document.getElementById('receiver-postal');
+  const isAUD = currentCurrency === 'AUD';
+  const hasMapsLink = mapsLinkInput && mapsLinkInput.value.trim().length > 0;
+
+  // When AUD is selected: Always compulsory
+  // When NPR is selected: Optional if Google Maps pin link is given, otherwise compulsory
+  const isLocationCompulsory = isAUD ? true : !hasMapsLink;
+
+  if (stateSelect) {
+    const group = stateSelect.closest('.form-group');
+    if (isLocationCompulsory && !stateSelect.value.trim()) {
+      if (group) group.classList.add('has-error');
+      valid = false;
+    } else {
+      if (group) group.classList.remove('has-error');
+    }
+  }
+
+  if (postalInput) {
+    const group = postalInput.closest('.form-group');
+    if (isLocationCompulsory && !postalInput.value.trim()) {
+      if (group) group.classList.add('has-error');
+      valid = false;
+    } else {
+      if (group) group.classList.remove('has-error');
+    }
+  }
+
+  // ── Receiver City / Suburb ──
+  const citySelect = document.getElementById('receiver-city');
+  const cityOtherInput = document.getElementById('receiver-city-other');
+  if (citySelect) {
+    const group = citySelect.closest('.form-group');
+    const val = citySelect.value.trim();
+    if (!val) {
+      if (group) group.classList.add('has-error');
+      valid = false;
+    } else if (val === 'OTHER') {
+      if (!cityOtherInput || !cityOtherInput.value.trim()) {
+        if (group) group.classList.add('has-error');
+        valid = false;
+      } else {
+        if (group) group.classList.remove('has-error');
+      }
+    } else {
+      if (group) group.classList.remove('has-error');
+    }
+  }
 
   // ── Email fields ──
   const emailFields = [
@@ -1205,6 +1373,16 @@ function showOrderSummary() {
     return el ? sanitizeText(el.value, 1000) : '';
   };
 
+  const getCityVal = () => {
+    const cEl = document.getElementById('receiver-city');
+    const cOther = document.getElementById('receiver-city-other');
+    if (!cEl) return '';
+    if (cEl.value === 'OTHER') {
+      return cOther ? sanitizeText(cOther.value, 100) : '';
+    }
+    return sanitizeText(cEl.value, 100);
+  };
+
   // Gather form data — keys match A3 backend spec exactly
   const data = {
     senderName: getVal('sender-name'),
@@ -1217,9 +1395,9 @@ function showOrderSummary() {
     secondaryContactNumber: getVal('receiver-secondary-contact'),
     secondaryContactEmail: getVal('receiver-secondary-email'),
     receiverContact: getVal('receiver-contact'),
-    deliveryAddress: getVal('receiver-address') || getVal('receiver-landmark') || getVal('receiver-city'),
+    deliveryAddress: getVal('receiver-address') || getVal('receiver-landmark') || getCityVal(),
     deliveryCountry: getVal('receiver-country'),
-    citySuburb: getVal('receiver-city'),
+    citySuburb: getCityVal(),
     stateTerritory: getVal('receiver-state'),
     postalCode: getVal('receiver-postal'),
     landmark: getVal('receiver-landmark'),
@@ -2043,32 +2221,135 @@ function initMobileMenu() {
 }
 
 // ============================================================
-// LIGHTBOX
+// LIGHTBOX & GALLERY VIEWER
 // ============================================================
 function initLightbox() {
   const lightbox = document.getElementById('lightbox');
   if (!lightbox) return;
 
   lightbox.addEventListener('click', (e) => {
+    // Only close if clicking the backdrop or close button (not the image, nav buttons, or dots)
     if (e.target === lightbox || e.target.classList.contains('lightbox-close')) {
       closeLightbox();
     }
   });
 
+  const prevBtn = document.getElementById('lightbox-prev');
+  const nextBtn = document.getElementById('lightbox-next');
+  if (prevBtn) prevBtn.addEventListener('click', lightboxPrev);
+  if (nextBtn) nextBtn.addEventListener('click', lightboxNext);
+
   document.addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('active')) return;
     if (e.key === 'Escape') {
       closeLightbox();
+    } else if (e.key === 'ArrowLeft') {
+      lightboxPrev();
+    } else if (e.key === 'ArrowRight') {
+      lightboxNext();
     }
   });
 }
 
+function openProductLightbox(productId, initialIndex = 0) {
+  const prod = PRODUCTS.find(p => p.id === productId);
+  if (!prod) return;
+  const hasMultiple = Array.isArray(prod.images) && prod.images.length > 0;
+  const images = hasMultiple ? prod.images : [prod.image || 'images/product-placeholder.jpg'];
+  openLightboxGallery(images, initialIndex, prod.name || '');
+}
+
+function openLightboxGallery(imagesArray, initialIndex = 0, altText = '') {
+  if (!Array.isArray(imagesArray) || imagesArray.length === 0) return;
+  currentLightboxImages = imagesArray;
+  currentLightboxIndex = Math.max(0, Math.min(initialIndex, imagesArray.length - 1));
+  currentLightboxAlt = altText;
+
+  updateLightboxView();
+
+  const lightbox = document.getElementById('lightbox');
+  if (lightbox) {
+    lightbox.classList.remove('is-circle');
+    lightbox.classList.add('active');
+  }
+}
+
+function updateLightboxView() {
+  const img = document.getElementById('lightbox-img');
+  const prevBtn = document.getElementById('lightbox-prev');
+  const nextBtn = document.getElementById('lightbox-next');
+  const dotsContainer = document.getElementById('lightbox-dots');
+
+  if (!img) return;
+
+  const currentSrc = currentLightboxImages[currentLightboxIndex];
+  img.src = currentSrc;
+  img.alt = currentLightboxAlt || '';
+
+  const hasMultiple = currentLightboxImages.length > 1;
+
+  if (prevBtn) prevBtn.style.display = hasMultiple ? 'flex' : 'none';
+  if (nextBtn) nextBtn.style.display = hasMultiple ? 'flex' : 'none';
+
+  if (dotsContainer) {
+    if (hasMultiple) {
+      dotsContainer.style.display = 'flex';
+      dotsContainer.innerHTML = currentLightboxImages.map((_, i) => `
+        <span class="lightbox-dot ${i === currentLightboxIndex ? 'active' : ''}" onclick="event.stopPropagation(); setLightboxIndex(${i})"></span>
+      `).join('');
+    } else {
+      dotsContainer.style.display = 'none';
+      dotsContainer.innerHTML = '';
+    }
+  }
+}
+
+function setLightboxIndex(index) {
+  if (index >= 0 && index < currentLightboxImages.length) {
+    currentLightboxIndex = index;
+    updateLightboxView();
+  }
+}
+
+function lightboxPrev(e) {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  if (currentLightboxImages.length <= 1) return;
+  currentLightboxIndex = (currentLightboxIndex - 1 + currentLightboxImages.length) % currentLightboxImages.length;
+  updateLightboxView();
+}
+
+function lightboxNext(e) {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  if (currentLightboxImages.length <= 1) return;
+  currentLightboxIndex = (currentLightboxIndex + 1) % currentLightboxImages.length;
+  updateLightboxView();
+}
+
 function openLightbox(src, alt, isCircle = false) {
+  currentLightboxImages = [src];
+  currentLightboxIndex = 0;
+  currentLightboxAlt = alt || '';
+
   const lightbox = document.getElementById('lightbox');
   const img = document.getElementById('lightbox-img');
+  const prevBtn = document.getElementById('lightbox-prev');
+  const nextBtn = document.getElementById('lightbox-next');
+  const dotsContainer = document.getElementById('lightbox-dots');
+
   if (!lightbox || !img) return;
 
   img.src = src;
   img.alt = alt || '';
+  if (prevBtn) prevBtn.style.display = 'none';
+  if (nextBtn) nextBtn.style.display = 'none';
+  if (dotsContainer) dotsContainer.style.display = 'none';
+
   if (isCircle || (src && (src.toLowerCase().includes('logo') || src.toLowerCase().includes('giftsbykrivya')))) {
     lightbox.classList.add('is-circle');
   } else {
@@ -2303,6 +2584,7 @@ function useMyLocation() {
       if (Number.isFinite(lat) && Number.isFinite(lng)) {
         linkInput.value = `https://www.google.com/maps?q=${lat.toFixed(6)},${lng.toFixed(6)}`;
         statusEl.textContent = '✅ Location captured and added above.';
+        updateConditionalRequiredFields();
       } else {
         statusEl.textContent = 'Could not determine valid coordinates.';
       }
@@ -2403,6 +2685,7 @@ function confirmMapLocation() {
   if (statusEl) statusEl.textContent = '✅ Location pinned and added above.';
 
   closeMapPicker();
+  updateConditionalRequiredFields();
 }
 
 function toggleSelfReceiver() {
@@ -2458,7 +2741,11 @@ function syncSelfReceiverFields() {
   if (rName && sName) rName.value = sName.value;
   if (rContact && sContact) rContact.value = sContact.value;
   if (rEmail && sEmail) rEmail.value = sEmail.value;
-  if (rCountry && sCountry) rCountry.value = sCountry.value;
+  if (rCountry && sCountry) {
+    rCountry.value = sCountry.value;
+    populateLocationDropdowns(rCountry.value);
+    updateConditionalRequiredFields();
+  }
 }
 
 function updateDeliveryInfoText(currency) {
@@ -2490,8 +2777,6 @@ function updateFormPlaceholders(currency) {
   const placeholderMap = {
     'sender-country': isNPR ? 'e.g. Nepal' : 'e.g. Australia',
     'receiver-country': isNPR ? 'e.g. Nepal' : 'e.g. Australia',
-    'receiver-city': isNPR ? 'e.g. Kathmandu, Pokhara' : 'e.g. Perth, Sydney',
-    'receiver-state': isNPR ? 'e.g. Bagmati Province' : 'e.g. Western Australia',
     'receiver-postal': isNPR ? 'e.g. 44600' : 'e.g. 6000',
     'sender-contact': isNPR ? 'e.g. +977 98X XXX XXX' : 'e.g. +61 4XX XXX XXX',
     'receiver-contact': isNPR ? "Receiver's phone number (e.g. +977 98X XXX XXX)" : "Receiver's phone number (e.g. +61 4XX XXX XXX)",
@@ -2521,4 +2806,127 @@ function isValidEmail(value) {
   // RFC 5322 compatible regex for production web apps
   const emailPattern = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
   return emailPattern.test(trimmed);
+}
+
+// ──────────────────────────────────────────────────────────────
+// LOCATION DROPDOWNS & CONDITIONAL REQUIRED FIELDS
+// ──────────────────────────────────────────────────────────────
+function populateLocationDropdowns(selectedCountry = null) {
+  const rCountry = document.getElementById('receiver-country');
+  const country = selectedCountry || (rCountry ? rCountry.value : '') || (currentCurrency === 'NPR' ? 'Nepal' : 'Australia');
+
+  populateStateDropdown(country);
+  populateCityDropdown(country);
+}
+
+function populateStateDropdown(country) {
+  const stateSelect = document.getElementById('receiver-state');
+  if (!stateSelect) return;
+
+  const currentVal = stateSelect.value;
+  stateSelect.innerHTML = '<option value="">— Select state / territory —</option>';
+
+  const isNepal = country === 'Nepal' || (!country && currentCurrency === 'NPR');
+  const list = isNepal ? NEPAL_PROVINCES : AUSTRALIA_STATES;
+
+  list.forEach(item => {
+    const opt = document.createElement('option');
+    opt.value = item.value;
+    opt.textContent = item.label;
+    if (item.value === currentVal) {
+      opt.selected = true;
+    }
+    stateSelect.appendChild(opt);
+  });
+}
+
+function populateCityDropdown(country, state = null) {
+  const citySelect = document.getElementById('receiver-city');
+  const stateSelect = document.getElementById('receiver-state');
+  const otherInput = document.getElementById('receiver-city-other');
+  if (!citySelect) return;
+
+  const selectedState = state !== null ? state : (stateSelect ? stateSelect.value : '');
+  const isNepal = country === 'Nepal' || (!country && currentCurrency === 'NPR');
+  const cityMap = isNepal ? NEPAL_CITIES : AUSTRALIA_CITIES;
+
+  const currentVal = citySelect.value;
+  citySelect.innerHTML = '<option value="">— Select city / suburb —</option>';
+
+  let cities = [];
+  if (selectedState && cityMap[selectedState]) {
+    cities = cityMap[selectedState];
+  } else {
+    // If no state selected, aggregate all cities for that country
+    Object.values(cityMap).forEach(arr => {
+      cities = cities.concat(arr);
+    });
+    cities = Array.from(new Set(cities)).sort();
+  }
+
+  cities.forEach(city => {
+    const opt = document.createElement('option');
+    opt.value = city;
+    opt.textContent = city;
+    if (city === currentVal) {
+      opt.selected = true;
+    }
+    citySelect.appendChild(opt);
+  });
+
+  // Add Other option
+  const otherOpt = document.createElement('option');
+  otherOpt.value = 'OTHER';
+  otherOpt.textContent = 'Other (type below)';
+  if (currentVal === 'OTHER') {
+    otherOpt.selected = true;
+  }
+  citySelect.appendChild(otherOpt);
+
+  // Update other input visibility
+  if (otherInput) {
+    if (citySelect.value === 'OTHER') {
+      otherInput.style.display = 'block';
+    } else {
+      otherInput.style.display = 'none';
+    }
+  }
+}
+
+function updateConditionalRequiredFields() {
+  const mapsLinkInput = document.getElementById('receiver-maps-link');
+  const stateSelect = document.getElementById('receiver-state');
+  const postalInput = document.getElementById('receiver-postal');
+  const stateStar = document.getElementById('state-required-star');
+  const postalStar = document.getElementById('postal-required-star');
+
+  const isAUD = currentCurrency === 'AUD';
+  const hasMapsLink = mapsLinkInput && mapsLinkInput.value.trim().length > 0;
+
+  // When AUD is selected: Always compulsory
+  // When NPR is selected: If Google Maps pin link is given -> NOT compulsory; otherwise compulsory
+  const isCompulsory = isAUD ? true : !hasMapsLink;
+
+  if (stateStar) stateStar.style.display = isCompulsory ? 'inline' : 'none';
+  if (postalStar) postalStar.style.display = isCompulsory ? 'inline' : 'none';
+
+  if (stateSelect) {
+    if (isCompulsory) {
+      stateSelect.setAttribute('required', 'required');
+    } else {
+      stateSelect.removeAttribute('required');
+      const group = stateSelect.closest('.form-group');
+      if (group) group.classList.remove('has-error');
+    }
+  }
+
+  if (postalInput) {
+    if (isCompulsory) {
+      postalInput.setAttribute('required', 'required');
+    } else {
+      postalInput.removeAttribute('required');
+      const group = postalInput.closest('.form-group');
+      if (group) group.classList.remove('has-error');
+    }
+  }
 }
