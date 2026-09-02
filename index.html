@@ -94,7 +94,8 @@
   </button>
 
   <!-- FLOATING ENQUIRY FAB (mobile only — see .mobile-enquiry-fab in style.css) -->
-  <button id="enquiry-fab" class="mobile-enquiry-fab" onclick="openCollectiveEnquiryModal()" aria-label="Enquire about selected products">
+  <button id="enquiry-fab" class="mobile-enquiry-fab" onclick="openCollectiveEnquiryModal()"
+    aria-label="Enquire about selected products">
     <span class="icon">💝</span>
     <span class="fab-label">Enquire</span>
     <span class="fab-count">0</span>
@@ -429,6 +430,18 @@
                 <option value="Australia">Australia</option>
               </select>
               <span class="error-msg">Please select the country.</span>
+            </div>
+            <div class="form-group">
+              <label for="receiver-state">State / Territory</label>
+              <input type="text" id="receiver-state" name="receiver-state" placeholder="e.g. Bagmati Province, WA"
+                maxlength="100">
+            </div>
+
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="receiver-postal">Postal Code</label>
+              <input type="text" id="receiver-postal" name="receiver-postal" placeholder="e.g. 44600" maxlength="20">
             </div>
             <div class="form-group">
               <label for="receiver-city">City / Suburb <span class="required">*</span></label>

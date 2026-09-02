@@ -14,10 +14,11 @@
 // This is a Google Apps Script Web App. It handles orders,
 // enquiries, feedback/reviews, and tracking lookups.
 // ──────────────────────────────────────────────────────────────
-const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbzhcasuC0Od5ZfPhMzWZ501fiH_vIiFgLugOocIhvDf1wGyYSRs7x66y0Uy5iQcqHlW/exec';
+const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycby3ygdEbVFiltOsk7BgM0PHyNIV405t4-FBgTmKLSvcclNKUFByeV3pV4qYv3jKHTNNUg/exec';
 
 // ──────────────────────────────────────────────────────────────
 // CONTACT INFO — Replace placeholder phone/links with your real ones
+
 // ──────────────────────────────────────────────────────────────
 const CONTACT = {
   whatsappNumber: '614XXXXXXXX',       // EDIT: Your WhatsApp number (with country code, no + or spaces)
@@ -35,6 +36,58 @@ const CONTACT = {
 //   and update the "image" field below with the filename.
 // ──────────────────────────────────────────────────────────────
 const PRODUCTS = [
+  {
+    id: 'Plushies',
+    name: 'Plushies',
+    description: 'Soft, cuddly companion made to be hugged and cherished.',
+    priceAUD: 16.30,
+    priceNPR: 0,        // EDIT: Add real NPR price
+    image: 'images/Items/whiteteddy.jpeg',
+    images: ['images/Items/teddy4.jpeg', 'images/Items/teddy3.jpeg', 'images/Items/teddy2.jpeg', 'images/Items/brownteddy.jpeg'], // Example multiple images
+  },
+  {
+    id: 'Mini photo-frame',
+    name: 'Mini Keepsake Frame',
+    description: 'A timeless frame to cherish your most beautiful moments.',
+    priceAUD: 8.70,
+    priceNPR: 0,        // EDIT: Add real NPR price
+    image: 'images/Items/Photoframe.jpeg',
+  },
+  {
+    id: 'mug-heat',
+    name: 'Magic Heat Mug',
+    subtitle: 'Heat Activated',
+    description: 'A magical mug that transforms when filled with hot drink.',
+    priceAUD: 19.60,
+    priceNPR: 0,        // EDIT: Add real NPR price
+    image: 'images/Items/Mug.png',
+  },
+
+  {
+    id: 'letter-jar',
+    name: 'Handwritten Letter Jar',
+    description: 'Little personalized handwritten notes filled with love.',
+    priceAUD: 5.40,
+    priceNPR: 0,        // EDIT: Add real NPR price
+    image: 'images/Items/bottle.jpeg',
+  },
+  {
+    id: 'scented Candle',
+    name: 'Aroma Scented Candle',
+    description: 'Infused with fragrance to create warmth and serenity.',
+    priceAUD: 5.40,
+    priceNPR: 0,        // EDIT: Add real NPR price
+    image: 'images/Items/Wax.jpeg',
+  },
+
+  {
+    id: 'perfume',
+    name: 'Signature Perfume',
+    description: 'A delicate fragrance crafted to leave a lasting impression.',
+    priceAUD: 20.20,
+    priceNPR: 0,        // EDIT: Add real NPR price
+    image: 'images/Items/perfume.jpeg',
+  },
   {
     id: 'Ferrero Box',
     name: 'Ferrero Collection Box',
@@ -101,39 +154,8 @@ const PRODUCTS = [
     priceNPR: 0,        // EDIT: Add real NPR price
     image: 'images/Items/tshirt2.png',
   },
-  {
-    id: 'mug-heat',
-    name: 'Magic Heat Mug',
-    subtitle: 'Heat Activated',
-    description: 'A magical mug that transforms when filled with hot drink.',
-    priceAUD: 19.60,
-    priceNPR: 0,        // EDIT: Add real NPR price
-    image: 'images/Items/Mug.png',
-  },
-  {
-    id: 'Mini photo-frame',
-    name: 'Mini Keepsake Frame',
-    description: 'A timeless frame to cherish your most beautiful moments.',
-    priceAUD: 8.70,
-    priceNPR: 0,        // EDIT: Add real NPR price
-    image: 'images/Items/Photoframe.jpeg',
-  },
-  {
-    id: 'letter-jar',
-    name: 'Handwritten Letter Jar',
-    description: 'Little personalized handwritten notes filled with love.',
-    priceAUD: 5.40,
-    priceNPR: 0,        // EDIT: Add real NPR price
-    image: 'images/Items/bottle.jpeg',
-  },
-  {
-    id: 'perfume',
-    name: 'Signature Perfume',
-    description: 'A delicate fragrance crafted to leave a lasting impression.',
-    priceAUD: 20.20,
-    priceNPR: 0,        // EDIT: Add real NPR price
-    image: 'images/Items/perfume.jpeg',
-  },
+
+
 
   {
     id: 'Lucky Keyring',
@@ -143,22 +165,25 @@ const PRODUCTS = [
     priceNPR: 0,        // EDIT: Add real NPR price
     image: 'images/Items/evileyes.jpeg',
   },
+
+
   {
-    id: 'scented Candle',
-    name: 'Aroma Scented Candle',
-    description: 'Infused with fragrance to create warmth and serenity.',
-    priceAUD: 5.40,
+    id: 'Cake',
+    name: 'Cake',
+    description: '',
+    priceAUD: 0,
     priceNPR: 0,        // EDIT: Add real NPR price
-    image: 'images/Items/Wax.jpeg',
+    image: 'images/Items/cake1.jpeg',
+    images: ['images/Items/cake2.jpeg', 'images/Items/cake3.jpeg', 'images/Items/cake4.jpeg', 'images/Items/cake5.jpeg'],
   },
   {
-    id: 'Teddy Bear',
-    name: 'Teddy Bear',
-    description: 'Soft, cuddly companion made to be hugged and cherished.',
-    priceAUD: 16.30,
+    id: 'Bouquet',
+    name: 'Bouquet',
+    description: '',
+    priceAUD: 45,
     priceNPR: 0,        // EDIT: Add real NPR price
-    image: 'images/Items/whiteteddy.jpeg',
-    images: ['images/Items/teddy4.jpeg', 'images/Items/teddy3.jpeg', 'images/Items/teddy2.jpeg', 'images/Items/brownteddy.jpeg'], // Example multiple images
+    image: 'images/Items/flower1.jpeg',
+    images: ['images/Items/flower2.jpeg', 'images/Items/flower3.jpeg', 'images/Items/flower4.jpeg', 'images/Items/flower5.jpeg', 'images/Items/flower6.jpeg', 'images/Items/flower7.jpeg', 'images/Items/flower8.jpeg', 'images/Items/flower9.jpeg', 'images/Items/flower10.jpeg', 'images/Items/flower11.jpeg', 'images/Items/flower12.jpeg', 'images/Items/flower13.jpeg', 'images/Items/flower14.jpeg', 'images/Items/flower15.jpeg'],
   },
 ];
 // ──────────────────────────────────────────────────────────────
@@ -1195,6 +1220,7 @@ function showOrderSummary() {
     deliveryAddress: getVal('receiver-address') || getVal('receiver-landmark') || getVal('receiver-city'),
     deliveryCountry: getVal('receiver-country'),
     citySuburb: getVal('receiver-city'),
+    stateTerritory: getVal('receiver-state'),
     postalCode: getVal('receiver-postal'),
     landmark: getVal('receiver-landmark'),
     mapsLink: getVal('receiver-maps-link'),
@@ -1253,25 +1279,27 @@ function showOrderSummary() {
       <h4>📦 Parcel ID: <span style="color:var(--rose-gold);">${escapeHtml(parcelId)}</span></h4>
     </div>
     <div class="summary-group">
-      <h4>👤 Sender Details</h4>
+      <h4>Sender Details</h4>
       <div class="summary-row"><span class="label">Name</span><span class="value">${escapeHtml(data.senderName)}</span></div>
       <div class="summary-row"><span class="label">Contact</span><span class="value">${escapeHtml(data.senderContact)}</span></div>
       <div class="summary-row"><span class="label">Email</span><span class="value">${escapeHtml(data.senderEmail)}</span></div>
       <div class="summary-row"><span class="label">Country</span><span class="value">${escapeHtml(data.senderCountry)}</span></div>
     </div>
     <div class="summary-group">
-      <h4>🎁 Receiver Details</h4>
+      <h4>Receiver Details</h4>
       <div class="summary-row"><span class="label">Full Name</span><span class="value">${escapeHtml(data.receiverName)}</span></div>
       <div class="summary-row"><span class="label">Contact</span><span class="value">${escapeHtml(data.receiverContact)}</span></div>
       <div class="summary-row"><span class="label">Email</span><span class="value">${escapeHtml(data.receiverEmail)}</span></div>
       <div class="summary-row"><span class="label">Country</span><span class="value">${escapeHtml(data.deliveryCountry)}</span></div>
       <div class="summary-row"><span class="label">City / Suburb</span><span class="value">${escapeHtml(data.citySuburb)}</span></div>
+      <div class="summary-row"><span class="label">State / Territory</span><span class="value">${escapeHtml(data.stateTerritory || '—')}</span></div>
+      <div class="summary-row"><span class="label">Postal Code</span><span class="value">${escapeHtml(data.postalCode || '—')}</span></div>
       <div class="summary-row"><span class="label">Landmark / Instructions</span><span class="value">${escapeHtml(data.landmark || '—')}</span></div>
       ${data.secondaryContactName ? `<div class="summary-row"><span class="label">Secondary Contact</span><span class="value">${escapeHtml(data.secondaryContactName)} (${escapeHtml(data.secondaryContactNumber || '—')})</span></div>` : ''}
       <div class="summary-row"><span class="label">Maps Location</span><span class="value">${safeMapsLink ? `<a href="${escapeHtml(safeMapsLink)}" target="_blank" rel="noopener noreferrer">View Pinned Location →</a>` : (data.mapsLink ? escapeHtml(data.mapsLink) : '—')}</span></div>
     </div>
     <div class="summary-group">
-      <h4>🎀 Gift Details</h4>
+      <h4>Gift Details</h4>
       <div class="summary-row"><span class="label">Cart Items</span><span class="value">${escapeHtml(cartStr || '—')}</span></div>
       <div class="summary-row"><span class="label">Additional Items</span><span class="value">${escapeHtml(data.additionalItems || '—')}</span></div>
       <div class="summary-row"><span class="label">Personal Message</span><span class="value">${escapeHtml(data.personalMessage || '—')}</span></div>
@@ -1313,7 +1341,7 @@ function showOrderSummary() {
 
     <div class="payment-actions">
       <button class="btn btn-primary btn-lg" id="submit-payment-btn" onclick="submitPayment()">
-        ✅ I've Made the Payment
+        I've Made the Payment
       </button>
       <button class="btn btn-outline btn-sm" onclick="editOrder()">
         ← Go Back & Edit Order
@@ -1486,6 +1514,7 @@ function submitPayment() {
     deliveryAddress: sanitizeText(data.deliveryAddress, 255),
     deliveryCountry: sanitizeText(data.deliveryCountry, 50),
     citySuburb: sanitizeText(data.citySuburb, 100),
+    stateTerritory: sanitizeText(data.stateTerritory, 100),
     postalCode: sanitizeText(data.postalCode, 20),
     landmark: sanitizeText(data.landmark, 255),
     mapsLink: isSafeUrl(data.mapsLink) ? data.mapsLink : '',
@@ -1578,7 +1607,7 @@ function renderErrorScreen(data, paymentRef) {
   const summaryContent = document.getElementById('summary-content');
   const btn = document.getElementById('submit-payment-btn');
   if (btn) {
-    btn.textContent = '✅ I\'ve Made the Payment';
+    btn.textContent = 'I\'ve Made the Payment';
     btn.disabled = false;
   }
 
@@ -2462,6 +2491,8 @@ function updateFormPlaceholders(currency) {
     'sender-country': isNPR ? 'e.g. Nepal' : 'e.g. Australia',
     'receiver-country': isNPR ? 'e.g. Nepal' : 'e.g. Australia',
     'receiver-city': isNPR ? 'e.g. Kathmandu, Pokhara' : 'e.g. Perth, Sydney',
+    'receiver-state': isNPR ? 'e.g. Bagmati Province' : 'e.g. Western Australia',
+    'receiver-postal': isNPR ? 'e.g. 44600' : 'e.g. 6000',
     'sender-contact': isNPR ? 'e.g. +977 98X XXX XXX' : 'e.g. +61 4XX XXX XXX',
     'receiver-contact': isNPR ? "Receiver's phone number (e.g. +977 98X XXX XXX)" : "Receiver's phone number (e.g. +61 4XX XXX XXX)",
     'receiver-secondary-contact': isNPR ? 'Backup phone number (e.g. +977 98X XXX XXX)' : 'Backup phone number (e.g. +61 4XX XXX XXX)',
