@@ -39,7 +39,7 @@ const PRODUCTS = [
   {
     id: 'Plushies',
     name: 'Plushies',
-    description: 'Soft, cuddly companion made to be hugged and cherished.',
+    description: 'Design/color may vary — one from the pictured plushies will be sent.',
     priceAUD: 16.30,
     priceNPR: 0,        // EDIT: Add real NPR price
     image: 'images/Items/whiteteddy.jpeg',
@@ -170,11 +170,11 @@ const PRODUCTS = [
   {
     id: 'Cake',
     name: 'Cake',
-    description: '',
-    priceAUD: 0,
+    description: 'Soft, moist, and freshly baked — customized with a message that makes it truly yours.',
+    priceAUD: 95,
     priceNPR: 0,        // EDIT: Add real NPR price
-    image: 'images/Items/cake1.jpeg',
-    images: ['images/Items/cake2.jpeg', 'images/Items/cake3.jpeg', 'images/Items/cake4.jpeg', 'images/Items/cake5.jpeg'],
+    image: '',
+    images: ['images/Items/cake1.jpeg', 'images/Items/cake2.jpeg', 'images/Items/cake3.jpeg', 'images/Items/cake4.jpeg', 'images/Items/cake5.jpeg'],
   },
   {
     id: 'Bouquet',
@@ -182,8 +182,8 @@ const PRODUCTS = [
     description: '',
     priceAUD: 45,
     priceNPR: 0,        // EDIT: Add real NPR price
-    image: 'images/Items/flower1.jpeg',
-    images: ['images/Items/flower2.jpeg', 'images/Items/flower3.jpeg', 'images/Items/flower4.jpeg', 'images/Items/flower5.jpeg', 'images/Items/flower6.jpeg', 'images/Items/flower7.jpeg', 'images/Items/flower8.jpeg', 'images/Items/flower9.jpeg', 'images/Items/flower10.jpeg', 'images/Items/flower11.jpeg', 'images/Items/flower12.jpeg', 'images/Items/flower13.jpeg', 'images/Items/flower14.jpeg', 'images/Items/flower15.jpeg'],
+    image: '',
+    images: ['images/Items/flower6.jpeg', 'images/Items/flower3.jpeg', 'images/Items/flower4.jpeg', 'images/Items/flower5.jpeg', 'images/Items/flower6.jpeg', 'images/Items/flower7.jpeg', 'images/Items/flower8.jpeg', 'images/Items/flower9.jpeg', 'images/Items/flower10.jpeg', 'images/Items/flower11.jpeg', 'images/Items/flower12.jpeg', 'images/Items/flower13.jpeg', 'images/Items/flower14.jpeg', 'images/Items/flower15.jpeg'],
   },
 ];
 // ──────────────────────────────────────────────────────────────
@@ -460,7 +460,7 @@ function renderProducts() {
           <div class="product-image-carousel" onclick="event.stopPropagation()">
             <button class="product-image-nav prev" onclick="scrollProductImage(event, '${escapeHtml(p.id)}', -1)">&#10094;</button>
             <div class="product-image-track" id="img-track-${escapeHtml(p.id)}">
-              ${imagesArray.map((img, idx) => `<img src="${escapeHtml(img)}" alt="${escapeHtml(safeName)}" onclick="openProductLightbox('${escapeHtml(p.id)}', ${idx})">`).join('')}
+              ${imagesArray.map((img, idx) => `<img src="${escapeHtml(img)}" alt="${escapeHtml(safeName)}" loading="lazy" decoding="async" onclick="openProductLightbox('${escapeHtml(p.id)}', ${idx})">`).join('')}
             </div>
             <button class="product-image-nav next" onclick="scrollProductImage(event, '${escapeHtml(p.id)}', 1)">&#10095;</button>
           </div>
@@ -469,7 +469,7 @@ function renderProducts() {
         const safeImage = imagesArray[0];
         imageHtml = `
           <div class="product-card-img-wrap" onclick="openProductLightbox('${escapeHtml(p.id)}', 0)">
-            <img src="${escapeHtml(safeImage)}" alt="${escapeHtml(safeName)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <img src="${escapeHtml(safeImage)}" alt="${escapeHtml(safeName)}" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
             <span class="placeholder-label" style="display:none;">📷 ${escapeHtml(safeImage.split('/').pop())}<br>Drop your photo here</span>
           </div>
         `;
@@ -2415,7 +2415,7 @@ function renderOccasionSpecials() {
           ${badgeHtml}
         </div>
         <div class="occasion-card-img">
-          <img src="${escapeHtml(o.image)}" alt="${escapeHtml(o.name)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <img src="${escapeHtml(o.image)}" alt="${escapeHtml(o.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
           <span class="placeholder-label" style="display:none;">📷 ${escapeHtml(o.image.split('/').pop())}<br>Drop your photo here</span>
         </div>
         <div class="occasion-card-body">
@@ -2441,7 +2441,7 @@ function openOccasionModal(occasionId) {
 
   document.getElementById('occasion-modal-items').innerHTML = o.packageItems.map(item => `
     <div style="display:flex; gap:12px; align-items:center; padding:10px 0; border-bottom:1px solid #f0e6e8;">
-      <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}"
+      <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" loading="lazy" decoding="async"
         style="width:48px; height:48px; object-fit:cover; border-radius:8px; flex-shrink:0; background:var(--pink-softer);"
         onerror="this.src=''; this.style.background='var(--pink-softer)';">
       <div style="flex:1;">
