@@ -805,6 +805,55 @@ function setCurrency(currency) {
 // ──────────────────────────────────────────────────────────────
 const NPR_CONVERSION_RATE = 109.67;
 
+// Shipping Rates Configuration
+// Normal delivery: 40 AUD -> in NPR: Math.round(40 * 109.67) = 4387
+// Express delivery: 50 AUD -> in NPR: Math.round(50 * 109.67) = 5484
+const SHIPPING_CONFIG = {
+  normal: {
+    id: 'normal',
+    name: 'Normal Delivery',
+    time: '5–7 business days',
+    priceAUD: 40,
+  },
+  express: {
+    id: 'express',
+    name: 'Express Delivery',
+    time: '1–3 business days',
+    priceAUD: 50,
+  }
+};
+
+function getShippingCost(type, currency = currentCurrency) {
+  const method = SHIPPING_CONFIG[type] || SHIPPING_CONFIG.normal;
+  if (currency === 'NPR') {
+    return Math.round(method.priceAUD * NPR_CONVERSION_RATE);
+  }
+  return method.priceAUD;
+}
+
+function formatShippingPrice(type, currency = currentCurrency) {
+  const cost = getShippingCost(type, currency);
+  if (currency === 'NPR') {
+    return `NPR ${cost.toLocaleString('en-IN')}`;
+  }
+  return `AUD $${cost.toFixed(2)}`;
+}
+
+function getSelectedDeliverySpeed() {
+  const checked = document.querySelector('input[name="delivery-speed"]:checked');
+  return (checked && checked.value === 'express') ? 'express' : 'normal';
+}
+
+function handleDeliverySpeedChange() {
+  const speed = getSelectedDeliverySpeed();
+  const normalCard = document.getElementById('method-card-normal');
+  const expressCard = document.getElementById('method-card-express');
+  if (normalCard) normalCard.classList.toggle('selected', speed === 'normal');
+  if (expressCard) expressCard.classList.toggle('selected', speed === 'express');
+  renderCartInForm();
+  updateSummaryTotal();
+}
+
 function getNprPrice(aud, npr) {
   const value = (npr && npr > 0) ? npr : (aud || 0) * NPR_CONVERSION_RATE;
   return Math.round(value); // whole rupees, no decimals
@@ -872,17 +921,23 @@ function renderCartInForm() {
 
   if (cart.length === 0) {
     container.innerHTML = '<p style="color:var(--espresso-light);">Your cart is empty. Please select items from the Gift Menu.</p>';
+    window._cartItemsAud = 0;
+    window._cartItemsNpr = 0;
+    window._cartShippingAud = 0;
+    window._cartShippingNpr = 0;
     window._cartTotalAud = 0;
     window._cartTotalNpr = 0;
     return;
   }
 
-  let totalAud = 0;
-  let totalNpr = 0;
+  let itemsAud = 0;
+  let itemsNpr = 0;
 
   const html = cart.map(item => {
-    totalAud += item.priceAUD * item.qty;
-    totalNpr += getNprPrice(item.priceAUD, item.priceNPR) * item.qty;
+    const audItem = item.priceAUD * item.qty;
+    const nprItem = getNprPrice(item.priceAUD, item.priceNPR) * item.qty;
+    itemsAud += audItem;
+    itemsNpr += nprItem;
     return `
       <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:8px; margin-bottom:8px; border-bottom:1px solid #eee;">
         <div>
@@ -894,16 +949,39 @@ function renderCartInForm() {
     `;
   }).join('');
 
+  const speed = getSelectedDeliverySpeed();
+  const shippingAud = getShippingCost(speed, 'AUD');
+  const shippingNpr = getShippingCost(speed, 'NPR');
+  const shippingName = SHIPPING_CONFIG[speed].name;
+
+  const totalAud = itemsAud + shippingAud;
+  const totalNpr = itemsNpr + shippingNpr;
+
+  window._cartItemsAud = itemsAud;
+  window._cartItemsNpr = itemsNpr;
+  window._cartShippingAud = shippingAud;
+  window._cartShippingNpr = shippingNpr;
   window._cartTotalAud = totalAud;
   window._cartTotalNpr = totalNpr;
 
-  const totalHtml = `
-    <div style="text-align:right; font-weight:600; margin-top:12px; color:var(--espresso);">
-      Total: ${formatPrice(totalAud, totalNpr)}
+  const summaryHtml = `
+    <div style="margin-top:14px; padding-top:12px; border-top:1.5px dashed rgba(247, 201, 216, 0.6); font-size:0.9rem;">
+      <div style="display:flex; justify-content:space-between; margin-bottom:6px; color:var(--espresso-light);">
+        <span>Items Subtotal:</span>
+        <span>${formatPrice(itemsAud, itemsNpr)}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:var(--espresso-light);">
+        <span>Shipping (${escapeHtml(shippingName)}):</span>
+        <span>${formatShippingPrice(speed)}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-weight:700; font-size:1.05rem; color:var(--espresso); padding-top:8px; border-top:1px solid #eee;">
+        <span>Total:</span>
+        <span style="color:var(--rose-gold);">${formatPrice(totalAud, totalNpr)}</span>
+      </div>
     </div>
   `;
 
-  container.innerHTML = html + totalHtml;
+  container.innerHTML = html + summaryHtml;
 }
 
 // ============================================================
@@ -1411,17 +1489,24 @@ function showOrderSummary() {
 
   // Build cart items string and compute totals
   const cartStr = cart.map(i => `${i.name} (x${i.qty})`).join(', ');
-  const totalAud = window._cartTotalAud || 0;
-  const totalNpr = window._cartTotalNpr || 0;
+  const speed = getSelectedDeliverySpeed();
+  const shippingMethodObj = SHIPPING_CONFIG[speed] || SHIPPING_CONFIG.normal;
+  const shippingCostFormatted = formatShippingPrice(speed);
+  const itemsAud = window._cartItemsAud || 0;
+  const itemsNpr = window._cartItemsNpr || 0;
+  const shippingAud = getShippingCost(speed, 'AUD');
+  const shippingNpr = getShippingCost(speed, 'NPR');
+  const totalAud = itemsAud + shippingAud;
+  const totalNpr = itemsNpr + shippingNpr;
 
   // Determine currency, order total, and advance
   const currency = currentCurrency;
   let orderTotal, advancePaid, advanceText;
 
   if (currency === 'NPR' && totalNpr > 0) {
-    orderTotal = totalNpr.toFixed(2);
-    advancePaid = totalNpr.toFixed(2); // 100% payment required
-    advanceText = `NPR ${advancePaid}`;
+    orderTotal = String(totalNpr); // whole rupees, no decimals
+    advancePaid = String(totalNpr); // 100% payment required
+    advanceText = `NPR ${totalNpr.toLocaleString('en-IN')}`;
   } else {
     orderTotal = totalAud.toFixed(2);
     advancePaid = totalAud.toFixed(2);
@@ -1442,6 +1527,9 @@ function showOrderSummary() {
     ...data,
     parcelId,
     packageItems: cartStr,
+    shippingMethod: `${shippingMethodObj.name} (${shippingMethodObj.time})`,
+    shippingCharge: shippingCostFormatted,
+    itemsSubtotal: formatPrice(itemsAud, itemsNpr),
     currency,
     orderTotal,
     advancePaid,
@@ -1477,13 +1565,16 @@ function showOrderSummary() {
       <div class="summary-row"><span class="label">Maps Location</span><span class="value">${safeMapsLink ? `<a href="${escapeHtml(safeMapsLink)}" target="_blank" rel="noopener noreferrer">View Pinned Location →</a>` : (data.mapsLink ? escapeHtml(data.mapsLink) : '—')}</span></div>
     </div>
     <div class="summary-group">
-      <h4>Gift Details</h4>
+      <h4>Gift & Delivery Details</h4>
       <div class="summary-row"><span class="label">Cart Items</span><span class="value">${escapeHtml(cartStr || '—')}</span></div>
+      <div class="summary-row"><span class="label">Delivery Speed</span><span class="value">${escapeHtml(shippingMethodObj.name)} (${escapeHtml(shippingMethodObj.time)})</span></div>
       <div class="summary-row"><span class="label">Additional Items</span><span class="value">${escapeHtml(data.additionalItems || '—')}</span></div>
       <div class="summary-row"><span class="label">Personal Message</span><span class="value">${escapeHtml(data.personalMessage || '—')}</span></div>
       <div class="summary-row"><span class="label">Customization</span><span class="value">${escapeHtml(data.customizationDetails || '—')}</span></div>
       <div class="summary-row"><span class="label">Delivery Date</span><span class="value">${escapeHtml(data.preferredDeliveryDate || '—')}</span></div>
       <div class="summary-row"><span class="label">Occasion</span><span class="value">${escapeHtml(data.occasion || '—')}</span></div>
+      <div class="summary-row" style="margin-top:8px; padding-top:8px; border-top:1px dashed rgba(247, 201, 216, 0.4);"><span class="label">Items Subtotal</span><span class="value">${formatPrice(itemsAud, itemsNpr)}</span></div>
+      <div class="summary-row"><span class="label">Shipping Charge</span><span class="value">${shippingCostFormatted}</span></div>
     </div>
     <div class="summary-total">Order Total: ${priceText}</div>
     <p class="summary-advance-note"><strong>Full payment secures your order.</strong> We ask for 100% payment upfront so we can start preparing your gift right away, with care. Your trust means everything to us — we won't let you down: <strong>${advanceText}</strong></p>
@@ -1546,7 +1637,12 @@ function editOrder() {
 function updateSummaryTotal() {
   const totalEl = document.querySelector('.summary-total');
   if (!totalEl) return;
-  const priceText = formatPrice(window._cartTotalAud || 0, window._cartTotalNpr || 0);
+  const speed = getSelectedDeliverySpeed();
+  const itemsAud = window._cartItemsAud || 0;
+  const itemsNpr = window._cartItemsNpr || 0;
+  const shippingAud = getShippingCost(speed, 'AUD');
+  const shippingNpr = getShippingCost(speed, 'NPR');
+  const priceText = formatPrice(itemsAud + shippingAud, itemsNpr + shippingNpr);
   totalEl.textContent = `Order Total: ${priceText}`;
 }
 
@@ -1697,6 +1793,8 @@ function submitPayment() {
     landmark: sanitizeText(data.landmark, 255),
     mapsLink: isSafeUrl(data.mapsLink) ? data.mapsLink : '',
     packageItems: sanitizeText(data.packageItems, 500),
+    shippingMethod: sanitizeText(data.shippingMethod, 100),
+    shippingCharge: sanitizeText(data.shippingCharge, 50),
     additionalItems: sanitizeText(data.additionalItems, 255),
     personalMessage: sanitizeText(data.personalMessage, 1000),
     customizationDetails: sanitizeText(data.customizationDetails, 1000),
@@ -1745,6 +1843,7 @@ function renderSuccessScreen(data, paymentRef) {
   const waMessage = encodeURIComponent(
     `🎁 *New Order Received*\n\n` +
     `📦 *Parcel ID:* ${data.parcelId}\n` +
+    `🚚 *Delivery:* ${data.shippingMethod || 'Normal Delivery'} (${data.shippingCharge || ''})\n` +
     `💰 *Order Total:* ${window._orderPriceText}\n` +
     `🧾 *Payment Ref:* ${paymentRef}`
   );
@@ -2769,6 +2868,18 @@ function updateDeliveryInfoText(currency) {
       ? 'Available for all other cities and states across Nepal.'
       : 'Available for all other cities and states across Australia.';
   }
+
+  // Update shipping tags in delivery info section
+  const normalChargeEl = document.getElementById('charge-normal-text');
+  const expressChargeEl = document.getElementById('charge-express-text');
+  if (normalChargeEl) normalChargeEl.textContent = formatShippingPrice('normal', currency);
+  if (expressChargeEl) expressChargeEl.textContent = formatShippingPrice('express', currency);
+
+  // Update delivery option prices in order form
+  const formNormalEl = document.getElementById('form-charge-normal');
+  const formExpressEl = document.getElementById('form-charge-express');
+  if (formNormalEl) formNormalEl.textContent = formatShippingPrice('normal', currency);
+  if (formExpressEl) formExpressEl.textContent = formatShippingPrice('express', currency);
 }
 
 function updateFormPlaceholders(currency) {
