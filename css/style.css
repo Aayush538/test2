@@ -2816,3 +2816,223 @@ h5 {
   cursor: pointer;
   padding: 4px 8px;
 }
+
+/* ──────────────────────────────────────────────────────────────
+   PERSONAL MESSAGE REQUIREMENT & FIXED RECEIVER COUNTRY STYLES
+   ────────────────────────────────────────────────────────────── */
+.form-control-readonly {
+  background-color: #fbf7f8 !important;
+  color: var(--espresso) !important;
+  font-weight: 600 !important;
+  cursor: default !important;
+  border-color: #eedde2 !important;
+}
+
+.personal-msg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.personal-msg-header label {
+  margin-bottom: 0 !important;
+}
+
+.personal-message-notice {
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+  line-height: 1.35;
+}
+
+.personal-message-notice.locked {
+  background: #fff3f5;
+  color: #a84255;
+  border: 1px solid #f6ccd6;
+}
+
+.personal-message-notice.unlocked {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.personal-message-notice .notice-icon {
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.btn-quick-add-jar {
+  background: #b76e79;
+  color: #ffffff;
+  border: none;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-left: 6px;
+  transition: background 0.2s ease, transform 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-quick-add-jar:hover {
+  background: #9c5560;
+  transform: translateY(-1px);
+}
+
+#order-message:disabled {
+  background-color: #fdfafd;
+  cursor: not-allowed;
+  opacity: 0.75;
+  border-style: dashed;
+  border-color: #eed6de;
+}
+
+.occasion-card-price-tag {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--rose-gold);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 6px;
+}
+
+.occasion-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.occasion-card-img {
+  cursor: zoom-in;
+}
+
+#lightbox {
+  z-index: 3500 !important;
+}
+
+.modal-close-btn:hover {
+  background: var(--pink-primary) !important;
+  color: var(--white) !important;
+  transform: scale(1.05);
+}
+
+.btn-quick-remove-jar {
+  background: #fdf2f4;
+  color: #a84255;
+  border: 1px solid #f5c2c7;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-left: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-quick-remove-jar:hover {
+  background: #a84255;
+  color: #ffffff;
+  border-color: #a84255;
+  transform: translateY(-1px);
+}
+
+/* ──────────────────────────────────────────────────────────────
+   LUXURY PAYMENT QR CARD STYLING (Single Clean Container)
+   ────────────────────────────────────────────────────────────── */
+.luxury-qr-container {
+  max-width: 290px;
+  width: 100%;
+  margin: 0 auto 24px;
+}
+
+.luxury-qr-card {
+  background: var(--white);
+  border: 1.5px solid #f3d7df;
+  border-radius: 20px;
+  padding: 22px 20px 20px;
+  box-shadow: 0 10px 30px rgba(183, 110, 121, 0.12);
+  text-align: center;
+  position: relative;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.luxury-qr-card:hover {
+  box-shadow: 0 14px 38px rgba(183, 110, 121, 0.18);
+}
+
+.luxury-qr-title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--espresso);
+  margin-bottom: 14px;
+  letter-spacing: 0.2px;
+}
+
+.luxury-qr-frame {
+  position: relative;
+  width: 210px;
+  height: 210px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-in;
+  border: none;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+  transition: transform 0.2s ease;
+}
+
+.luxury-qr-frame:hover {
+  transform: scale(1.02);
+}
+
+.luxury-qr-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: 10px;
+}
+
+.luxury-qr-zoom-hint {
+  position: absolute;
+  bottom: 6px;
+  background: rgba(40, 30, 30, 0.75);
+  backdrop-filter: blur(4px);
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 12px;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+/* Date picker click-anywhere helper */
+#order-date,
+input[type="date"] {
+  cursor: pointer;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+
+
+

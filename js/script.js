@@ -46,6 +46,15 @@ const PRODUCTS = [
     images: ['images/Items/teddy4.jpeg', 'images/Items/teddy3.jpeg', 'images/Items/teddy2.jpeg', 'images/Items/brownteddy.jpeg'], // Example multiple images
   },
   {
+    id: 'Emotional Support Plant',
+    name: 'Emotional Support Plant',
+    description: 'Design/color may vary — one from the pictured Plant will be sent.',
+    priceAUD: 50,
+    priceNPR: 0,        // EDIT: Add real NPR price
+    image: '',
+    images: ['images/Items/emotionalsupportplant1.jpeg', 'images/Items/emotionalsupportplant2.jpeg', 'images/Items/emotionalsupportplant3.jpeg'], // Example multiple images
+  },
+  {
     id: 'Mini photo-frame',
     name: 'Mini Keepsake Frame',
     description: 'A timeless frame to cherish your most beautiful moments.',
@@ -139,7 +148,7 @@ const PRODUCTS = [
   {
     id: 'plain-tshirt',
     name: 'Plain Cotton T-Shirt',
-    subtitle: 'Color options available',
+    subtitle: 'Color options & different sizes available',
     description: 'Ultra-soft, premium combed cotton for everyday comfort.',
     priceAUD: 19.60,
     priceNPR: 0,        // EDIT: Add real NPR price
@@ -148,7 +157,7 @@ const PRODUCTS = [
   {
     id: 'POLO T-SHIRT',
     name: 'Classic Polo T-Shirt',
-    subtitle: 'Color options available',
+    subtitle: 'Color options & different sizes available',
     description: 'Sophisticated collared fit crafted from breathable fabric.',
     priceAUD: 30.40,
     priceNPR: 0,        // EDIT: Add real NPR price
@@ -195,6 +204,27 @@ const PRODUCTS = [
 // purchasable items. Edit names/prices/images when ready.
 // ──────────────────────────────────────────────────────────────
 const OCCASION_SPECIALS = [
+  {
+    id: 'her-care-package',
+    name: 'Her Care Package',
+    badgeText: 'Special Offer',
+    hasIcon: true,
+    priceAUD: 135,
+    priceNPR: 0,
+    image: 'images/Items/HerCarePackage.jpeg',
+    teaser: 'A delightful care hamper curated with warmth, self-care, and adorable Sanrio-themed keepsakes.',
+    description: 'Includes Kuromi heat up wheat bag, cute pink teddy bear, strawberry face mask, sweet hand cream, nourishing lip oil, lip care, Hello Kitty fuzzy socks, and a My Melody plush pouch bag.',
+    packageItems: [
+      { id: 'hcp-wheatbag', name: 'Kuromi Heat Up Wheat Bag', icon: '-', description: 'Plush heatable wheat bag for cozy warmth' },
+      { id: 'hcp-teddy', name: 'Plush Pink Teddy Bear', icon: '-', description: 'Cute, fluffy and cuddly companion' },
+      { id: 'hcp-facemask', name: 'Strawberry Face Sheet Mask', icon: '-', description: 'Hydrating and revitalizing skin pamper' },
+      { id: 'hcp-handcream', name: 'Moisturizing Hand Cream', icon: '-', description: 'Silky smooth nourishing hand cream' },
+      { id: 'hcp-lipoil', name: 'Glossy Hydrating Lip Oil', icon: '-', description: 'Rich nourishing moisture' },
+      { id: 'hcp-lipcare', name: 'Soothing Lip Balm', icon: '-', description: 'Daily protective lip care' },
+      { id: 'hcp-socks', name: 'Hello Kitty Fuzzy Warm Socks', icon: '-', description: 'Ultra-soft cozy winter socks' },
+      { id: 'hcp-pouch', name: 'My Melody Plush Pouch Bag', icon: '-', description: 'Soft pink plush essentials bag with bow' },
+    ]
+  }
 ];
 // ──────────────────────────────────────────────────────────────
 // GIFT MEANINGS — Edit or add meanings here
@@ -282,8 +312,7 @@ const REVIEWS = [
 // PAYMENT QR IMAGES — Replace with your actual QR code images
 // ──────────────────────────────────────────────────────────────
 const PAYMENT_IMAGES = {
-  esewaQR: 'images/QR/EsewaCropped.png',               // EDIT: Path to your eSewa QR image
-  laxmiBankQR: 'images/QR/LaxmiCropped.png',      // EDIT: Path to your Laxmi Sunrise Bank QR image
+  nabilBankQR: 'images/QR/NabilBankQR.png',      // Nabil Bank QR image
 };
 
 // ──────────────────────────────────────────────────────────────
@@ -368,6 +397,9 @@ function sanitizeCart(rawCart) {
     if (!item || !item.id || typeof item.id !== 'string') return;
     let refProduct = PRODUCTS.find(p => p.id === item.id);
     if (!refProduct) {
+      refProduct = OCCASION_SPECIALS.find(occ => occ.id === item.id);
+    }
+    if (!refProduct) {
       for (const occ of OCCASION_SPECIALS) {
         if (occ.packageItems) {
           const found = occ.packageItems.find(pi => pi.id === item.id);
@@ -428,7 +460,8 @@ document.addEventListener('DOMContentLoaded', () => {
   checkPreSelectedProduct();
   updateCartBadge();
   renderCartInForm();
-  populateLocationDropdowns();
+  populateLocationDropdowns('Australia');
+  restoreOrderFormData();
   updateConditionalRequiredFields();
   updateFormPlaceholders(currentCurrency);
   updateDeliveryInfoText(currentCurrency);
@@ -776,12 +809,12 @@ function setCurrency(currency) {
   document.getElementById('curr-aud').classList.toggle('active', currency === 'AUD');
   document.getElementById('curr-npr').classList.toggle('active', currency === 'NPR');
 
-  // Sync receiver country dropdown with currency
+  // Receiver country is fixed to Australia
   const rCountry = document.getElementById('receiver-country');
   if (rCountry) {
-    rCountry.value = (currency === 'NPR') ? 'Nepal' : 'Australia';
+    rCountry.value = 'Australia';
   }
-  populateLocationDropdowns((currency === 'NPR') ? 'Nepal' : 'Australia');
+  populateLocationDropdowns('Australia');
   updateConditionalRequiredFields();
 
   // Update all prices on the page
@@ -790,6 +823,9 @@ function setCurrency(currency) {
     const npr = parseFloat(el.dataset.npr);
     el.textContent = formatPrice(aud, npr);
   });
+
+  // Re-render occasion specials with updated currency
+  renderOccasionSpecials();
 
   // Update cart display & summary total if visible
   renderCartInForm();
@@ -876,15 +912,81 @@ function getProductPrice(product) {
 // ============================================================
 // CART LOGIC (sessionStorage only)
 // ============================================================
+function hasLetterJarInCart() {
+  return cart.some(item => item.id === 'letter-jar');
+}
+
+function updatePersonalMessageState() {
+  const msgInput = document.getElementById('order-message');
+  const notice = document.getElementById('personal-message-notice');
+  if (!msgInput) return;
+
+  const hasJar = hasLetterJarInCart();
+  if (hasJar) {
+    msgInput.disabled = false;
+    msgInput.placeholder = "Write a heartfelt message to include with the gift...";
+    if (notice) {
+      notice.className = 'personal-message-notice unlocked';
+      notice.innerHTML = `
+        <span class="notice-icon"></span>
+        <span class="notice-text"><strong>Handwritten Letter Jar in cart!</strong> Your personal message will be handwritten and sealed.</span>
+        <button type="button" class="btn-quick-remove-jar" onclick="quickRemoveLetterJar()" title="Remove Letter Jar from cart">✕ Remove</button>
+      `;
+    }
+  } else {
+    msgInput.disabled = true;
+    msgInput.value = '';
+    msgInput.placeholder = "Personal message is only available when Handwritten Letter Jar is added to cart.";
+    if (notice) {
+      notice.className = 'personal-message-notice locked';
+      notice.innerHTML = `
+        <span class="notice-icon"></span>
+        <span class="notice-text">For adding a personal message, you must add <strong>Handwritten Letter Jar</strong> to your cart.</span>
+        <button type="button" class="btn-quick-add-jar" onclick="quickAddLetterJar()">+ Add Letter Jar</button>
+      `;
+    }
+  }
+}
+
+function quickRemoveLetterJar() {
+  removeFromCart('letter-jar');
+  updatePersonalMessageState();
+  showToast('Handwritten Letter Jar removed from order', 'info');
+}
+
+function quickAddLetterJar() {
+  addToCart('letter-jar');
+  updatePersonalMessageState();
+  const msgInput = document.getElementById('order-message');
+  if (msgInput) {
+    msgInput.focus();
+  }
+}
+
 function saveCart() {
   sessionStorage.setItem('giftCart', JSON.stringify(cart));
   updateCartBadge();
   renderCartInForm();
   renderCartDrawer();
+  updatePersonalMessageState();
 }
 
 function addToCart(productId) {
-  const p = PRODUCTS.find(prod => prod.id === productId);
+  let p = PRODUCTS.find(prod => prod.id === productId);
+  if (!p) {
+    p = OCCASION_SPECIALS.find(occ => occ.id === productId);
+  }
+  if (!p) {
+    for (const occ of OCCASION_SPECIALS) {
+      if (occ.packageItems) {
+        const found = occ.packageItems.find(pi => pi.id === productId);
+        if (found) {
+          p = found;
+          break;
+        }
+      }
+    }
+  }
   if (!p) return;
 
   const existing = cart.find(i => i.id === productId);
@@ -982,6 +1084,7 @@ function renderCartInForm() {
   `;
 
   container.innerHTML = html + summaryHtml;
+  updatePersonalMessageState();
 }
 
 // ============================================================
@@ -1101,18 +1204,20 @@ function initForm() {
   setMinDeliveryDate();
 
   // Location dropdown change listeners
-  const rCountry = document.getElementById('receiver-country');
   const rState = document.getElementById('receiver-state');
   const rCity = document.getElementById('receiver-city');
   const rCityOther = document.getElementById('receiver-city-other');
   const mapsInput = document.getElementById('receiver-maps-link');
 
-  if (rCountry) {
-    rCountry.addEventListener('change', () => {
-      populateLocationDropdowns(rCountry.value);
-      updateConditionalRequiredFields();
-    });
+  populateLocationDropdowns('Australia');
+  updateConditionalRequiredFields();
+  updatePersonalMessageState();
+
+  const sCountry = document.getElementById('sender-country');
+  if (sCountry) {
+    sCountry.addEventListener('change', handleSenderCountryChange);
   }
+  handleSenderCountryChange();
 
   if (rState) {
     rState.addEventListener('change', () => {
@@ -1219,12 +1324,178 @@ function initForm() {
     });
   });
 
+  // Date picker click helper: clicking anywhere inside opens picker
+  const dateInput = document.getElementById('order-date');
+  if (dateInput) {
+    dateInput.addEventListener('click', () => {
+      if (typeof dateInput.showPicker === 'function') {
+        try {
+          dateInput.showPicker();
+        } catch (err) {
+          // ignore if unsupported or already showing
+        }
+      }
+    });
+  }
+
+  // Auto-save form inputs to sessionStorage
+  form.addEventListener('input', saveOrderFormData);
+  form.addEventListener('change', saveOrderFormData);
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     if (validateForm()) {
       showOrderSummary();
     }
   });
+}
+
+// ── SESSION STORAGE PERSISTENCE FOR ORDER FORM ──
+const ORDER_FORM_STORAGE_KEY = 'giftOrderFormData';
+
+function saveOrderFormData() {
+  const form = document.getElementById('order-form');
+  if (!form) return;
+
+  const data = {
+    senderCountry: getVal('sender-country'),
+    senderName: getVal('sender-name'),
+    senderContact: getVal('sender-contact'),
+    senderEmail: getVal('sender-email'),
+    selfReceiverCheck: !!document.getElementById('self-receiver-check')?.checked,
+
+    receiverName: getVal('receiver-name'),
+    receiverContact: getVal('receiver-contact'),
+    receiverEmail: getVal('receiver-email'),
+    receiverCountry: getVal('receiver-country') || 'Australia',
+    receiverState: getVal('receiver-state'),
+    receiverPostal: getVal('receiver-postal'),
+    receiverCity: getVal('receiver-city'),
+    receiverCityOther: getVal('receiver-city-other'),
+    receiverLandmark: getVal('receiver-landmark'),
+    receiverSecondaryName: getVal('receiver-secondary-name'),
+    receiverSecondaryContact: getVal('receiver-secondary-contact'),
+    receiverMapsLink: getVal('receiver-maps-link'),
+
+    deliverySpeed: document.querySelector('input[name="delivery-speed"]:checked')?.value || 'normal',
+    orderOccasion: getVal('order-occasion'),
+    orderAdditional: getVal('order-additional'),
+    orderMessage: getVal('order-message'),
+    orderCustomization: getVal('order-customization'),
+    orderDate: getVal('order-date'),
+  };
+
+  try {
+    sessionStorage.setItem(ORDER_FORM_STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    // ignore
+  }
+}
+
+function restoreOrderFormData() {
+  const form = document.getElementById('order-form');
+  if (!form) return;
+
+  let saved = null;
+  try {
+    const raw = sessionStorage.getItem(ORDER_FORM_STORAGE_KEY);
+    if (raw) saved = JSON.parse(raw);
+  } catch (e) {
+    return;
+  }
+  if (!saved || typeof saved !== 'object') return;
+
+  const setIfVal = (id, val) => {
+    if (val !== undefined && val !== null && val !== '') {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    }
+  };
+
+  // 1. Sender Country & Details
+  if (saved.senderCountry) {
+    const sCountry = document.getElementById('sender-country');
+    if (sCountry) sCountry.value = saved.senderCountry;
+  }
+  handleSenderCountryChange();
+
+  setIfVal('sender-name', saved.senderName);
+  setIfVal('sender-contact', saved.senderContact);
+  setIfVal('sender-email', saved.senderEmail);
+
+  // 2. Self Ordering Checkbox & Receiver Name/Contact/Email
+  const selfCheck = document.getElementById('self-receiver-check');
+  const sCountryVal = getVal('sender-country');
+  if (selfCheck && saved.selfReceiverCheck && sCountryVal === 'Australia') {
+    selfCheck.checked = true;
+    toggleSelfReceiver();
+  } else {
+    if (selfCheck) selfCheck.checked = false;
+    setIfVal('receiver-name', saved.receiverName);
+    setIfVal('receiver-contact', saved.receiverContact);
+    setIfVal('receiver-email', saved.receiverEmail);
+  }
+
+  // 3. Receiver Location
+  if (saved.receiverCountry) {
+    const rCountry = document.getElementById('receiver-country');
+    if (rCountry) rCountry.value = saved.receiverCountry;
+  }
+
+  if (saved.receiverState) {
+    const rState = document.getElementById('receiver-state');
+    if (rState) {
+      rState.value = saved.receiverState;
+      const country = getVal('receiver-country') || 'Australia';
+      populateCityDropdown(country, saved.receiverState);
+    }
+  }
+
+  if (saved.receiverCity) {
+    const rCity = document.getElementById('receiver-city');
+    if (rCity) {
+      rCity.value = saved.receiverCity;
+      if (saved.receiverCity === 'OTHER') {
+        const rCityOther = document.getElementById('receiver-city-other');
+        if (rCityOther) {
+          rCityOther.style.display = 'block';
+          if (saved.receiverCityOther) rCityOther.value = saved.receiverCityOther;
+        }
+      }
+    }
+  }
+
+  setIfVal('receiver-postal', saved.receiverPostal);
+  setIfVal('receiver-landmark', saved.receiverLandmark);
+  setIfVal('receiver-secondary-name', saved.receiverSecondaryName);
+  setIfVal('receiver-secondary-contact', saved.receiverSecondaryContact);
+  setIfVal('receiver-maps-link', saved.receiverMapsLink);
+
+  // 4. Shipping Option
+  if (saved.deliverySpeed) {
+    const radio = document.querySelector(`input[name="delivery-speed"][value="${saved.deliverySpeed}"]`);
+    if (radio) {
+      radio.checked = true;
+      handleDeliverySpeedChange();
+    }
+  }
+
+  // 5. Occasion & extras
+  setIfVal('order-occasion', saved.orderOccasion);
+  setIfVal('order-additional', saved.orderAdditional);
+  setIfVal('order-customization', saved.orderCustomization);
+  setIfVal('order-date', saved.orderDate);
+
+  // 6. Personal Message
+  updatePersonalMessageState();
+  if (saved.orderMessage) {
+    const msgEl = document.getElementById('order-message');
+    if (msgEl && !msgEl.disabled) {
+      msgEl.value = saved.orderMessage;
+    }
+  }
+
+  updateConditionalRequiredFields();
 }
 
 function setMinDeliveryDate() {
@@ -1481,7 +1752,7 @@ function showOrderSummary() {
     landmark: getVal('receiver-landmark'),
     mapsLink: getVal('receiver-maps-link'),
     additionalItems: getVal('order-additional'),
-    personalMessage: getVal('order-message'),
+    personalMessage: hasLetterJarInCart() ? getVal('order-message') : '',
     customizationDetails: getVal('order-customization'),
     preferredDeliveryDate: getVal('order-date'),
     occasion: getVal('order-occasion'),
@@ -1542,7 +1813,7 @@ function showOrderSummary() {
 
   wrapper.innerHTML = `
     <div class="summary-group">
-      <h4>📦 Parcel ID: <span style="color:var(--rose-gold);">${escapeHtml(parcelId)}</span></h4>
+      <h4> Parcel ID: <span style="color:var(--rose-gold);">${escapeHtml(parcelId)}</span></h4>
     </div>
     <div class="summary-group">
       <h4>Sender Details</h4>
@@ -1579,17 +1850,17 @@ function showOrderSummary() {
     <div class="summary-total">Order Total: ${priceText}</div>
     <p class="summary-advance-note"><strong>Full payment secures your order.</strong> We ask for 100% payment upfront so we can start preparing your gift right away, with care. Your trust means everything to us — we won't let you down: <strong>${advanceText}</strong></p>
 
-    <h4 style="font-family:var(--font-display); margin-bottom:16px; text-align:center;">Payment Options</h4>
-    <div class="payment-qr-row">
-      <div class="qr-card">
-        <h5>eSewa QR</h5>
-        <img src="${PAYMENT_IMAGES.esewaQR}" alt="eSewa QR Code" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-        <span class="placeholder-label" style="display:none;">📷 esewa-qr.jpg<br>Place your eSewa QR image here</span>
-      </div>
-      <div class="qr-card">
-        <h5>Laxmi Sunrise Bank QR</h5>
-        <img src="${PAYMENT_IMAGES.laxmiBankQR}" alt="Laxmi Sunrise Bank QR Code" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-        <span class="placeholder-label" style="display:none;">📷 laxmi-bank-qr.jpg<br>Place your bank QR image here</span>
+    <div class="luxury-qr-container">
+      <div class="luxury-qr-card">
+        <h4 class="luxury-qr-title">Nabil Bank</h4>
+        
+        <div class="luxury-qr-frame" onclick="openLightbox('${PAYMENT_IMAGES.nabilBankQR}', 'Nabil Bank QR Code')">
+          <img src="${PAYMENT_IMAGES.nabilBankQR}" alt="Nabil Bank QR" class="luxury-qr-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <span class="placeholder-label" style="display:none;">📷 NabilBank.png<br>Place your Nabil Bank QR image here</span>
+          <div class="luxury-qr-zoom-hint">
+            <span>🔍</span> Tap to enlarge
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1823,8 +2094,11 @@ function submitPayment() {
       if (result && result.success) {
         renderSuccessScreen(data, paymentRef);
         sessionStorage.removeItem('giftCart');
+        sessionStorage.removeItem(ORDER_FORM_STORAGE_KEY);
         cart = [];
         updateCartBadge();
+        const form = document.getElementById('order-form');
+        if (form) form.reset();
         paymentScreenshotBase64 = null;
       } else {
         renderErrorScreen(data, paymentRef);
@@ -2339,9 +2613,27 @@ function initLightbox() {
   if (nextBtn) nextBtn.addEventListener('click', lightboxNext);
 
   document.addEventListener('keydown', (e) => {
-    if (!lightbox.classList.contains('active')) return;
     if (e.key === 'Escape') {
-      closeLightbox();
+      const lightbox = document.getElementById('lightbox');
+      if (lightbox && lightbox.classList.contains('active')) {
+        closeLightbox();
+        return;
+      }
+      const occModal = document.getElementById('occasion-modal');
+      if (occModal && occModal.classList.contains('active')) {
+        closeOccasionModal();
+        return;
+      }
+      const revModal = document.getElementById('review-modal');
+      if (revModal && revModal.classList.contains('active')) {
+        closeReviewModal();
+        return;
+      }
+      const enqModal = document.getElementById('enquiry-modal');
+      if (enqModal && enqModal.classList.contains('active')) {
+        closeEnquiryModal();
+        return;
+      }
     } else if (e.key === 'ArrowLeft') {
       lightboxPrev();
     } else if (e.key === 'ArrowRight') {
@@ -2497,7 +2789,7 @@ function renderOccasionSpecials() {
       <div class="occasion-coming-soon">
         <span class="occasion-coming-soon-icon"></span>
         <h3>Something Special is Coming Soon</h3>
-        <p>We're preparing our next festival gift collection — check back soon!</p>
+        <p>We're preparing our next gift collection for you  <br> Check back soon!</p>
       </div>
     `;
     return;
@@ -2505,31 +2797,40 @@ function renderOccasionSpecials() {
 
   grid.innerHTML = OCCASION_SPECIALS.map(o => {
     const badgeHtml = o.hasIcon
-      ? `<span class="badge-star">✨</span><span class="badge-text">${escapeHtml(o.badgeText || 'Featured')}</span>`
-      : `<span class="badge-text">${escapeHtml(o.badgeText || 'Festival Special')}</span>`;
+      ? `<span class="badge-star">✨</span><span class="badge-text">${escapeHtml(o.badgeText || 'Special Offer')}</span>`
+      : `<span class="badge-text">${escapeHtml(o.badgeText || 'Special Package')}</span>`;
+
+    const priceHtml = formatPrice(o.priceAUD, o.priceNPR);
 
     return `
       <article class="occasion-card fade-in" data-occasion-id="${escapeHtml(o.id)}">
         <div class="occasion-card-badge">
           ${badgeHtml}
         </div>
-        <div class="occasion-card-img">
+        <div class="occasion-card-img" onclick="openLightbox('${escapeHtml(o.image)}', '${escapeHtml(o.name)}')">
           <img src="${escapeHtml(o.image)}" alt="${escapeHtml(o.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
           <span class="placeholder-label" style="display:none;">📷 ${escapeHtml(o.image.split('/').pop())}<br>Drop your photo here</span>
         </div>
-        <div class="occasion-card-body">
+        <div class="occasion-card-body" style="text-align:center;">
           <div>
             <h3 class="occasion-card-name">${escapeHtml(o.name)}</h3>
+            <div class="occasion-card-price-tag">${priceHtml}</div>
             <p class="occasion-card-desc">${escapeHtml(o.teaser)}</p>
           </div>
-          <button class="btn btn-primary btn-sm occasion-btn" onclick="openOccasionModal('${escapeHtml(o.id)}')">
-            View Package (${o.packageItems ? o.packageItems.length : 0} items)
-          </button>
+          <div class="occasion-card-actions">
+            <button class="btn btn-primary btn-sm occasion-btn" style="flex:1;" onclick="addToCart('${escapeHtml(o.id)}')">
+              🛒 Add to Order
+            </button>
+            <button class="btn btn-outline btn-sm occasion-btn" style="flex:1;" onclick="openOccasionModal('${escapeHtml(o.id)}')">
+              View Details
+            </button>
+          </div>
         </div>
       </article>
     `;
   }).join('');
 }
+
 function openOccasionModal(occasionId) {
   const o = OCCASION_SPECIALS.find(item => item.id === occasionId);
   const modal = document.getElementById('occasion-modal');
@@ -2538,38 +2839,60 @@ function openOccasionModal(occasionId) {
   document.getElementById('occasion-modal-name').textContent = o.name;
   document.getElementById('occasion-modal-teaser').textContent = o.teaser;
 
-  document.getElementById('occasion-modal-items').innerHTML = o.packageItems.map(item => `
-    <div style="display:flex; gap:12px; align-items:center; padding:10px 0; border-bottom:1px solid #f0e6e8;">
-      <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" loading="lazy" decoding="async"
-        style="width:48px; height:48px; object-fit:cover; border-radius:8px; flex-shrink:0; background:var(--pink-softer);"
-        onerror="this.src=''; this.style.background='var(--pink-softer)';">
-      <div style="flex:1;">
-        <div style="font-weight:600; font-size:0.9rem;">${escapeHtml(item.name)}</div>
-        <div style="font-size:0.85rem; color:var(--espresso-light);">${formatPrice(item.priceAUD, item.priceNPR)}</div>
+  const badgeEl = document.getElementById('occasion-modal-badge');
+  if (badgeEl) {
+    badgeEl.textContent = o.badgeText || 'Special Offer';
+  }
+
+  const heroContainer = document.getElementById('occasion-modal-hero');
+  const imgEl = document.getElementById('occasion-modal-img');
+  if (imgEl && o.image) {
+    imgEl.src = o.image;
+    imgEl.alt = o.name;
+    if (heroContainer) {
+      heroContainer.style.display = 'block';
+      heroContainer.onclick = function () {
+        openLightbox(o.image, o.name);
+      };
+    }
+  } else if (heroContainer) {
+    heroContainer.style.display = 'none';
+  }
+
+  const itemsContainer = document.getElementById('occasion-modal-items');
+  if (itemsContainer) {
+    itemsContainer.innerHTML = (o.packageItems || []).map(item => `
+      <div style="display:flex; align-items:center; gap:12px; background:#fff8f9; border:1px solid #f6dfe4; border-radius:10px; padding:8px 12px; transition:transform 0.15s ease;">
+        <span style="font-size:1.25rem; flex-shrink:0;">${item.icon || '🎁'}</span>
+        <div style="flex:1; text-align:left;">
+          <div style="font-weight:600; font-size:0.88rem; color:var(--espresso);">${escapeHtml(item.name)}</div>
+          ${item.description ? `<div style="font-size:0.78rem; color:var(--espresso-light); line-height:1.35;">${escapeHtml(item.description)}</div>` : ''}
+        </div>
       </div>
-      <button class="btn btn-primary btn-sm" onclick="addOccasionItemToCart('${escapeHtml(o.id)}', '${escapeHtml(item.id)}')">
-        🛒 Add
-      </button>
-    </div>
-  `).join('');
+    `).join('');
+  }
+
+  document.getElementById('occasion-modal-price').textContent = `Package Price: ${formatPrice(o.priceAUD, o.priceNPR)}`;
+
+  const addBtn = document.getElementById('occasion-modal-add-btn');
+  if (addBtn) {
+    addBtn.onclick = function () {
+      addToCart(o.id);
+      closeOccasionModal();
+    };
+  }
+
+  const enqBtn = document.getElementById('occasion-modal-enquire-btn');
+  if (enqBtn) {
+    enqBtn.onclick = function () {
+      closeOccasionModal();
+      if (typeof openCollectiveEnquiryModal === 'function') {
+        openCollectiveEnquiryModal();
+      }
+    };
+  }
 
   modal.classList.add('active');
-}
-
-function addOccasionItemToCart(occasionId, itemId) {
-  const o = OCCASION_SPECIALS.find(item => item.id === occasionId);
-  if (!o) return;
-  const item = o.packageItems.find(i => i.id === itemId);
-  if (!item) return;
-
-  const existing = cart.find(i => i.id === item.id);
-  if (existing) {
-    existing.qty += 1;
-  } else {
-    cart.push({ ...item, qty: 1 });
-  }
-  saveCart();
-  showToast(item.name + ' added to your order!', 'success');
 }
 
 function closeOccasionModal() {
@@ -2787,14 +3110,62 @@ function confirmMapLocation() {
   updateConditionalRequiredFields();
 }
 
+function handleSenderCountryChange() {
+  const sCountry = document.getElementById('sender-country');
+  const selfCheck = document.getElementById('self-receiver-check');
+  const selfRow = selfCheck ? selfCheck.closest('.checkbox-row') : null;
+  const selfHint = document.getElementById('self-receiver-hint');
+  const val = sCountry ? sCountry.value : '';
+
+  const isAustralia = val === 'Australia';
+
+  if (selfCheck) {
+    if (isAustralia) {
+      selfCheck.disabled = false;
+      if (selfRow) {
+        selfRow.style.opacity = '1';
+        selfRow.style.cursor = 'pointer';
+      }
+      if (selfHint) {
+        selfHint.style.display = 'none';
+      }
+    } else {
+      if (selfCheck.checked) {
+        selfCheck.checked = false;
+        toggleSelfReceiver();
+      }
+      selfCheck.disabled = true;
+      if (selfRow) {
+        selfRow.style.opacity = '0.6';
+        selfRow.style.cursor = 'not-allowed';
+      }
+      if (selfHint) {
+        selfHint.style.display = 'inline';
+        if (val === 'Nepal') {
+          selfHint.textContent = '(Ordering for self is only available when sender country is Australia)';
+        } else {
+          selfHint.textContent = '(Select Australia as sender country to enable Ordering for Self)';
+        }
+      }
+    }
+  }
+}
+
 function toggleSelfReceiver() {
+  const sCountry = document.getElementById('sender-country');
   const checkEl = document.getElementById('self-receiver-check');
+
+  if (checkEl && checkEl.checked && (!sCountry || sCountry.value !== 'Australia')) {
+    checkEl.checked = false;
+    showToast('Ordering for self is only available when sender country is Australia.', 'info');
+    return;
+  }
+
   const checked = checkEl ? checkEl.checked : false;
   const fieldsToSync = [
     { from: 'sender-name', to: 'receiver-name' },
     { from: 'sender-contact', to: 'receiver-contact' },
     { from: 'sender-email', to: 'receiver-email' },
-    { from: 'sender-country', to: 'receiver-country' },
   ];
 
   fieldsToSync.forEach(pair => {
@@ -2830,21 +3201,14 @@ function syncSelfReceiverFields() {
   const sName = document.getElementById('sender-name');
   const sContact = document.getElementById('sender-contact');
   const sEmail = document.getElementById('sender-email');
-  const sCountry = document.getElementById('sender-country');
 
   const rName = document.getElementById('receiver-name');
   const rContact = document.getElementById('receiver-contact');
   const rEmail = document.getElementById('receiver-email');
-  const rCountry = document.getElementById('receiver-country');
 
   if (rName && sName) rName.value = sName.value;
   if (rContact && sContact) rContact.value = sContact.value;
   if (rEmail && sEmail) rEmail.value = sEmail.value;
-  if (rCountry && sCountry) {
-    rCountry.value = sCountry.value;
-    populateLocationDropdowns(rCountry.value);
-    updateConditionalRequiredFields();
-  }
 }
 
 function updateDeliveryInfoText(currency) {
@@ -2923,8 +3287,7 @@ function isValidEmail(value) {
 // LOCATION DROPDOWNS & CONDITIONAL REQUIRED FIELDS
 // ──────────────────────────────────────────────────────────────
 function populateLocationDropdowns(selectedCountry = null) {
-  const rCountry = document.getElementById('receiver-country');
-  const country = selectedCountry || (rCountry ? rCountry.value : '') || (currentCurrency === 'NPR' ? 'Nepal' : 'Australia');
+  const country = 'Australia'; // Delivery receiver country is fixed to Australia
 
   populateStateDropdown(country);
   populateCityDropdown(country);
