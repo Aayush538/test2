@@ -49,10 +49,10 @@ const PRODUCTS = [
     id: 'Emotional Support Plant',
     name: 'Emotional Support Plant',
     description: 'Design/color may vary — one from the pictured Plant will be sent.',
-    priceAUD: 50,
+    priceAUD: 35,
     priceNPR: 0,        // EDIT: Add real NPR price
     image: '',
-    images: ['images/Items/emotionalsupportplant1.jpeg', 'images/Items/emotionalsupportplant2.jpeg', 'images/Items/emotionalsupportplant3.jpeg'], // Example multiple images
+    images: ['images/Items/emotionalsupportplant1.jpeg', 'images/Items/emotionalsupportplant2.jpeg', 'images/Items/emotionalsupportplant3.jpeg', 'images/Items/emotionalsupportplantsingle1.jpeg'], // Example multiple images
   },
   {
     id: 'Mini photo-frame',
@@ -163,9 +163,6 @@ const PRODUCTS = [
     priceNPR: 0,        // EDIT: Add real NPR price
     image: 'images/Items/tshirt2.png',
   },
-
-
-
   {
     id: 'Lucky Keyring',
     name: 'Lucky Evil Eye Keyring',
@@ -174,7 +171,6 @@ const PRODUCTS = [
     priceNPR: 0,        // EDIT: Add real NPR price
     image: 'images/Items/evileyes.jpeg',
   },
-
 
   {
     id: 'Cake',
@@ -186,13 +182,30 @@ const PRODUCTS = [
     images: ['images/Items/cake1.jpeg', 'images/Items/cake2.jpeg', 'images/Items/cake3.jpeg', 'images/Items/cake4.jpeg', 'images/Items/cake5.jpeg'],
   },
   {
-    id: 'Bouquet',
-    name: 'Bouquet',
+    id: 'Real_Bouquet',
+    name: 'Real Bouquet',
+    description: '',
+    priceAUD: 95,
+    priceNPR: 0,        // EDIT: Add real NPR price
+    image: '',
+    images: ['images/Items/Realbouquet5.jpeg', 'images/Items/Realbouquet2.jpeg', 'images/Items/Realbouquet3.jpeg', 'images/Items/Realbouquet4.jpeg', 'images/Items/Realbouquet1.jpeg'],
+  },
+  {
+    id: 'Artificial_Bouquet',
+    name: 'Artificial Bouquet',
     description: '',
     priceAUD: 45,
     priceNPR: 0,        // EDIT: Add real NPR price
     image: '',
-    images: ['images/Items/flower6.jpeg', 'images/Items/flower3.jpeg', 'images/Items/flower4.jpeg', 'images/Items/flower5.jpeg', 'images/Items/flower6.jpeg', 'images/Items/flower7.jpeg', 'images/Items/flower8.jpeg', 'images/Items/flower9.jpeg', 'images/Items/flower10.jpeg', 'images/Items/flower11.jpeg', 'images/Items/flower12.jpeg', 'images/Items/flower13.jpeg', 'images/Items/flower14.jpeg', 'images/Items/flower15.jpeg'],
+    images: ['images/Items/Artificialbouquet1.jpeg', 'images/Items/Artificialbouquet2.jpeg', 'images/Items/Artificialbouquet3.jpeg', 'images/Items/Artificialbouquet4.jpeg', 'images/Items/Artificialbouquet5.jpeg'],
+  },
+  {
+    id: 'Single_Rose',
+    name: 'Single Rose',
+    description: '',
+    priceAUD: 20,
+    priceNPR: 0,        // EDIT: Add real NPR price
+    image: 'images/Items/Single Rose.jpeg',
   },
 ];
 // ──────────────────────────────────────────────────────────────
