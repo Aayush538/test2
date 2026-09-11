@@ -2953,53 +2953,72 @@ h5 {
    LUXURY PAYMENT QR CARD STYLING (Single Clean Container)
    ────────────────────────────────────────────────────────────── */
 .luxury-qr-container {
-  max-width: 290px;
+  max-width: 320px;
   width: 100%;
-  margin: 0 auto 24px;
+  margin: 28px auto 28px;
 }
 
 .luxury-qr-card {
   background: var(--white);
-  border: 1.5px solid #f3d7df;
-  border-radius: 20px;
-  padding: 22px 20px 20px;
-  box-shadow: 0 10px 30px rgba(183, 110, 121, 0.12);
+  border: 1.5px solid #f0d4dc;
+  border-radius: 22px;
+  padding: 28px 24px 24px;
+  box-shadow: 0 8px 32px rgba(183, 110, 121, 0.10), 0 2px 8px rgba(0,0,0,0.04);
   text-align: center;
   position: relative;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
+  overflow: hidden;
+}
+
+.luxury-qr-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--rose-gold), #f7c9d8, var(--rose-gold));
+  border-radius: 22px 22px 0 0;
 }
 
 .luxury-qr-card:hover {
-  box-shadow: 0 14px 38px rgba(183, 110, 121, 0.18);
+  box-shadow: 0 12px 40px rgba(183, 110, 121, 0.16), 0 4px 12px rgba(0,0,0,0.05);
+  transform: translateY(-2px);
 }
 
 .luxury-qr-title {
   font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--espresso);
-  margin-bottom: 14px;
-  letter-spacing: 0.2px;
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
+}
+
+.luxury-qr-title + p {
+  font-size: 0.78rem;
+  color: var(--espresso-light);
+  margin: 0 0 16px;
 }
 
 .luxury-qr-frame {
   position: relative;
-  width: 210px;
-  height: 210px;
+  width: 230px;
+  height: 230px;
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: zoom-in;
-  border: none;
-  background: transparent;
-  padding: 0;
-  box-shadow: none;
-  transition: transform 0.2s ease;
+  background: #fff;
+  border: 2px solid #f3e4ea;
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: inset 0 1px 4px rgba(183, 110, 121, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .luxury-qr-frame:hover {
-  transform: scale(1.02);
+  transform: scale(1.03);
+  box-shadow: 0 6px 20px rgba(183, 110, 121, 0.12), inset 0 1px 4px rgba(183, 110, 121, 0.06);
 }
 
 .luxury-qr-image {
@@ -3007,21 +3026,75 @@ h5 {
   height: 100%;
   object-fit: contain;
   display: block;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .luxury-qr-zoom-hint {
   position: absolute;
-  bottom: 6px;
-  background: rgba(40, 30, 30, 0.75);
-  backdrop-filter: blur(4px);
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(40, 30, 30, 0.72);
+  backdrop-filter: blur(6px);
   color: #ffffff;
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 12px;
-  opacity: 0.9;
+  padding: 4px 12px;
+  border-radius: 20px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
   pointer-events: none;
+  white-space: nowrap;
+}
+
+.luxury-qr-frame:hover .luxury-qr-zoom-hint {
+  opacity: 1;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   REAL BOUQUET → EXPRESS DELIVERY NOTE
+   ────────────────────────────────────────────────────────────── */
+.real-bouquet-delivery-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #fff5f8, #fef0f4);
+  border: 1.5px solid rgba(247, 170, 195, 0.45);
+  border-left: 3.5px solid var(--rose-gold);
+  border-radius: 12px;
+  animation: noteFadeIn 0.4s ease;
+}
+
+.real-bouquet-delivery-note .note-icon {
+  font-size: 1.25rem;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+.real-bouquet-delivery-note .note-text {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--espresso);
+  font-weight: 500;
+}
+
+@keyframes noteFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Disabled Normal Delivery card when Real Bouquet is in cart */
+.delivery-method-card.disabled-delivery {
+  opacity: 0.45;
+  pointer-events: none;
+  cursor: not-allowed;
+  filter: grayscale(0.3);
+  border-color: rgba(200, 200, 200, 0.5);
+  background: rgba(240, 238, 236, 0.5);
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 /* Date picker click-anywhere helper */

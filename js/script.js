@@ -478,6 +478,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateConditionalRequiredFields();
   updateFormPlaceholders(currentCurrency);
   updateDeliveryInfoText(currentCurrency);
+  enforceRealBouquetDelivery();
 });
 
 // ============================================================
@@ -903,6 +904,48 @@ function handleDeliverySpeedChange() {
   updateSummaryTotal();
 }
 
+// ── REAL BOUQUET → force Express Delivery ──
+function hasRealBouquetInCart() {
+  return cart.some(item => item.id === 'Real_Bouquet');
+}
+
+function enforceRealBouquetDelivery() {
+  const normalRadio = document.querySelector('input[name="delivery-speed"][value="normal"]');
+  const expressRadio = document.querySelector('input[name="delivery-speed"][value="express"]');
+  const normalCard = document.getElementById('method-card-normal');
+  const expressCard = document.getElementById('method-card-express');
+  const note = document.getElementById('real-bouquet-delivery-note');
+  if (!normalRadio || !expressRadio) return;
+
+  if (hasRealBouquetInCart()) {
+    // Force express
+    expressRadio.checked = true;
+    normalRadio.checked = false;
+    normalRadio.disabled = true;
+
+    // Visual: dim normal card, select express
+    if (normalCard) {
+      normalCard.classList.remove('selected');
+      normalCard.classList.add('disabled-delivery');
+    }
+    if (expressCard) expressCard.classList.add('selected');
+
+    // Show warm note
+    if (note) note.style.display = 'flex';
+
+    // Update totals with express pricing
+    renderCartInForm();
+    updateSummaryTotal();
+  } else {
+    // Restore normal as selectable
+    normalRadio.disabled = false;
+    if (normalCard) normalCard.classList.remove('disabled-delivery');
+
+    // Hide note
+    if (note) note.style.display = 'none';
+  }
+}
+
 function getNprPrice(aud, npr) {
   const value = (npr && npr > 0) ? npr : (aud || 0) * NPR_CONVERSION_RATE;
   return Math.round(value); // whole rupees, no decimals
@@ -982,6 +1025,7 @@ function saveCart() {
   renderCartInForm();
   renderCartDrawer();
   updatePersonalMessageState();
+  enforceRealBouquetDelivery();
 }
 
 function addToCart(productId) {
