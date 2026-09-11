@@ -184,7 +184,7 @@ const PRODUCTS = [
   {
     id: 'Real_Bouquet',
     name: 'Real Bouquet',
-    description: '',
+    description: 'Fresh, beautiful flowers perfect for every special moment.',
     priceAUD: 95,
     priceNPR: 0,        // EDIT: Add real NPR price
     image: '',
@@ -193,7 +193,7 @@ const PRODUCTS = [
   {
     id: 'Artificial_Bouquet',
     name: 'Artificial Bouquet',
-    description: '',
+    description: 'Beautiful everlasting flowers for a lasting impression.',
     priceAUD: 45,
     priceNPR: 0,        // EDIT: Add real NPR price
     image: '',
@@ -202,7 +202,7 @@ const PRODUCTS = [
   {
     id: 'Single_Rose',
     name: 'Single Rose',
-    description: '',
+    description: 'A simple, elegant rose to express love and affection.',
     priceAUD: 20,
     priceNPR: 0,        // EDIT: Add real NPR price
     image: 'images/Items/Single Rose.jpeg',
