@@ -1393,6 +1393,11 @@ function initForm() {
         }
       }
     });
+    dateInput.addEventListener('change', () => {
+      if (dateInput.value.trim() && dateInput.closest('.form-group')) {
+        dateInput.closest('.form-group').classList.remove('has-error');
+      }
+    });
   }
 
   // Auto-save form inputs to sessionStorage
@@ -1567,6 +1572,18 @@ function setMinDeliveryDate() {
   const dd = String(minDate.getDate()).padStart(2, '0');
 
   dateInput.min = `${yyyy}-${mm}-${dd}`;
+}
+
+function openDatePicker() {
+  const dateInput = document.getElementById('order-date');
+  if (!dateInput) return;
+  if (typeof dateInput.showPicker === 'function') {
+    try {
+      dateInput.showPicker();
+      return;
+    } catch (err) {}
+  }
+  dateInput.focus();
 }
 
 function validateForm() {
