@@ -401,6 +401,7 @@ const NEPAL_CITIES = {
 let currentCurrency = 'AUD';
 let selectedProduct = null;
 let paymentScreenshotBase64 = null;
+let isOrderSummaryGenerated = false;
 
 // ── CART (sessionStorage with catalog validation) ──
 function sanitizeCart(rawCart) {
@@ -505,11 +506,13 @@ function renderProducts() {
       if (hasMultipleImages) {
         imageHtml = `
           <div class="product-image-carousel" onclick="event.stopPropagation()">
+            <span class="product-gallery-badge">📸 ${imagesArray.length} Photos</span>
             <button class="product-image-nav prev" onclick="scrollProductImage(event, '${escapeHtml(p.id)}', -1)">&#10094;</button>
             <div class="product-image-track" id="img-track-${escapeHtml(p.id)}">
               ${imagesArray.map((img, idx) => `<img src="${escapeHtml(img)}" alt="${escapeHtml(safeName)}" loading="lazy" decoding="async" onclick="openProductLightbox('${escapeHtml(p.id)}', ${idx})">`).join('')}
             </div>
             <button class="product-image-nav next" onclick="scrollProductImage(event, '${escapeHtml(p.id)}', 1)">&#10095;</button>
+            <span class="product-zoom-hint">🔍 Tap to view</span>
           </div>
         `;
       } else {
@@ -518,6 +521,7 @@ function renderProducts() {
           <div class="product-card-img-wrap" onclick="openProductLightbox('${escapeHtml(p.id)}', 0)">
             <img src="${escapeHtml(safeImage)}" alt="${escapeHtml(safeName)}" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
             <span class="placeholder-label" style="display:none;">📷 ${escapeHtml(safeImage.split('/').pop())}<br>Drop your photo here</span>
+            <span class="product-zoom-hint">🔍 Tap to view</span>
           </div>
         `;
       }
@@ -1026,6 +1030,7 @@ function saveCart() {
   renderCartDrawer();
   updatePersonalMessageState();
   enforceRealBouquetDelivery();
+  refreshOrderSummary(true);
 }
 
 function addToCart(productId) {
@@ -1400,9 +1405,23 @@ function initForm() {
     });
   }
 
-  // Auto-save form inputs to sessionStorage
-  form.addEventListener('input', saveOrderFormData);
-  form.addEventListener('change', saveOrderFormData);
+  // Auto-save form inputs to sessionStorage and live-update summary if generated
+  let formSummaryDebounce = null;
+  form.addEventListener('input', () => {
+    saveOrderFormData();
+    if (isOrderSummaryGenerated) {
+      clearTimeout(formSummaryDebounce);
+      formSummaryDebounce = setTimeout(() => {
+        refreshOrderSummary(true);
+      }, 350);
+    }
+  });
+  form.addEventListener('change', () => {
+    saveOrderFormData();
+    if (isOrderSummaryGenerated) {
+      refreshOrderSummary(true);
+    }
+  });
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -1781,13 +1800,24 @@ function validateForm() {
 // ORDER SUMMARY
 // ============================================================
 function showOrderSummary() {
-  const section = document.getElementById('order-summary-section');
-  const wrapper = document.getElementById('summary-content');
-
   // Anti-spam honeypot check
   const hp = document.getElementById('order-hp');
   if (hp && hp.value.trim() !== '') {
     showToast('Your order could not be processed at this time.', 'error');
+    return;
+  }
+
+  isOrderSummaryGenerated = true;
+  refreshOrderSummary(false);
+}
+
+function refreshOrderSummary(keepScroll = true) {
+  const section = document.getElementById('order-summary-section');
+  const wrapper = document.getElementById('summary-content');
+  if (!section || !wrapper) return;
+
+  // Only auto-update if the summary has already been generated once
+  if (!isOrderSummaryGenerated && !window._orderData) {
     return;
   }
 
@@ -1806,7 +1836,7 @@ function showOrderSummary() {
     return sanitizeText(cEl.value, 100);
   };
 
-  // Gather form data — keys match A3 backend spec exactly
+  // Gather form data — keys match backend spec
   const data = {
     senderName: getVal('sender-name'),
     senderContact: getVal('sender-contact'),
@@ -1832,17 +1862,34 @@ function showOrderSummary() {
     occasion: getVal('order-occasion'),
   };
 
-  // Build cart items string and compute totals
-  const cartStr = cart.map(i => `${i.name} (x${i.qty})`).join(', ');
+  // Build cart items string and compute fresh totals
+  const cartStr = cart.length > 0
+    ? cart.map(i => `${i.name} (x${i.qty})`).join(', ')
+    : 'No items in cart';
+
   const speed = getSelectedDeliverySpeed();
   const shippingMethodObj = SHIPPING_CONFIG[speed] || SHIPPING_CONFIG.normal;
   const shippingCostFormatted = formatShippingPrice(speed);
-  const itemsAud = window._cartItemsAud || 0;
-  const itemsNpr = window._cartItemsNpr || 0;
+
+  // Calculate directly from cart array
+  let itemsAud = 0;
+  let itemsNpr = 0;
+  cart.forEach(item => {
+    itemsAud += (item.priceAUD || 0) * (item.qty || 1);
+    itemsNpr += getNprPrice(item.priceAUD, item.priceNPR) * (item.qty || 1);
+  });
+
   const shippingAud = getShippingCost(speed, 'AUD');
   const shippingNpr = getShippingCost(speed, 'NPR');
   const totalAud = itemsAud + shippingAud;
   const totalNpr = itemsNpr + shippingNpr;
+
+  window._cartItemsAud = itemsAud;
+  window._cartItemsNpr = itemsNpr;
+  window._cartShippingAud = shippingAud;
+  window._cartShippingNpr = shippingNpr;
+  window._cartTotalAud = totalAud;
+  window._cartTotalNpr = totalNpr;
 
   // Determine currency, order total, and advance
   const currency = currentCurrency;
@@ -1859,13 +1906,19 @@ function showOrderSummary() {
   }
   const priceText = formatPrice(totalAud, totalNpr);
 
-  // Generate Parcel ID: GK-YYMMDD-####
-  const d = new Date();
-  const yy = String(d.getFullYear()).slice(2);
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  const rand = String(Math.floor(Math.random() * 9000) + 1000);
-  const parcelId = `GK-${yy}${mm}${dd}-${rand}`;
+  // Preserve existing Parcel ID so it doesn't shift on every cart change
+  let parcelId = window._orderData?.parcelId;
+  if (!parcelId) {
+    const d = new Date();
+    const yy = String(d.getFullYear()).slice(2);
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const rand = String(Math.floor(Math.random() * 9000) + 1000);
+    parcelId = `GK-${yy}${mm}${dd}-${rand}`;
+  }
+
+  // Preserve user-typed payment reference if already entered
+  const existingPaymentRef = document.getElementById('payment-ref')?.value || '';
 
   // Store for submitPayment
   window._orderData = {
@@ -1891,18 +1944,18 @@ function showOrderSummary() {
     </div>
     <div class="summary-group">
       <h4>Sender Details</h4>
-      <div class="summary-row"><span class="label">Name</span><span class="value">${escapeHtml(data.senderName)}</span></div>
-      <div class="summary-row"><span class="label">Contact</span><span class="value">${escapeHtml(data.senderContact)}</span></div>
-      <div class="summary-row"><span class="label">Email</span><span class="value">${escapeHtml(data.senderEmail)}</span></div>
-      <div class="summary-row"><span class="label">Country</span><span class="value">${escapeHtml(data.senderCountry)}</span></div>
+      <div class="summary-row"><span class="label">Name</span><span class="value">${escapeHtml(data.senderName || '—')}</span></div>
+      <div class="summary-row"><span class="label">Contact</span><span class="value">${escapeHtml(data.senderContact || '—')}</span></div>
+      <div class="summary-row"><span class="label">Email</span><span class="value">${escapeHtml(data.senderEmail || '—')}</span></div>
+      <div class="summary-row"><span class="label">Country</span><span class="value">${escapeHtml(data.senderCountry || '—')}</span></div>
     </div>
     <div class="summary-group">
       <h4>Receiver Details</h4>
-      <div class="summary-row"><span class="label">Full Name</span><span class="value">${escapeHtml(data.receiverName)}</span></div>
-      <div class="summary-row"><span class="label">Contact</span><span class="value">${escapeHtml(data.receiverContact)}</span></div>
-      <div class="summary-row"><span class="label">Email</span><span class="value">${escapeHtml(data.receiverEmail)}</span></div>
-      <div class="summary-row"><span class="label">Country</span><span class="value">${escapeHtml(data.deliveryCountry)}</span></div>
-      <div class="summary-row"><span class="label">City / Suburb</span><span class="value">${escapeHtml(data.citySuburb)}</span></div>
+      <div class="summary-row"><span class="label">Full Name</span><span class="value">${escapeHtml(data.receiverName || '—')}</span></div>
+      <div class="summary-row"><span class="label">Contact</span><span class="value">${escapeHtml(data.receiverContact || '—')}</span></div>
+      <div class="summary-row"><span class="label">Email</span><span class="value">${escapeHtml(data.receiverEmail || '—')}</span></div>
+      <div class="summary-row"><span class="label">Country</span><span class="value">${escapeHtml(data.deliveryCountry || '—')}</span></div>
+      <div class="summary-row"><span class="label">City / Suburb</span><span class="value">${escapeHtml(data.citySuburb || '—')}</span></div>
       <div class="summary-row"><span class="label">State / Territory</span><span class="value">${escapeHtml(data.stateTerritory || '—')}</span></div>
       <div class="summary-row"><span class="label">Postal Code</span><span class="value">${escapeHtml(data.postalCode || '—')}</span></div>
       <div class="summary-row"><span class="label">Landmark / Instructions</span><span class="value">${escapeHtml(data.landmark || '—')}</span></div>
@@ -1963,32 +2016,31 @@ function showOrderSummary() {
     </div>
   `;
 
-  // Reset screenshot state if opened freshly
+  // Restore payment ref value
+  const refInput = document.getElementById('payment-ref');
+  if (refInput && existingPaymentRef) {
+    refInput.value = existingPaymentRef;
+  }
+
+  // Restore screenshot preview if attached
   if (paymentScreenshotBase64) {
     renderScreenshotPreview('Payment Screenshot', 'Attached');
   }
 
-  // Show summary section, hide form
+  // Ensure summary section stays visible
   section.classList.add('visible');
-  section.scrollIntoView({ behavior: 'smooth' });
+
+  if (!keepScroll) {
+    section.scrollIntoView({ behavior: 'smooth' });
+  }
 }
 
 function editOrder() {
-  const section = document.getElementById('order-summary-section');
-  section.classList.remove('visible');
   document.getElementById('order-form-section').scrollIntoView({ behavior: 'smooth' });
 }
 
 function updateSummaryTotal() {
-  const totalEl = document.querySelector('.summary-total');
-  if (!totalEl) return;
-  const speed = getSelectedDeliverySpeed();
-  const itemsAud = window._cartItemsAud || 0;
-  const itemsNpr = window._cartItemsNpr || 0;
-  const shippingAud = getShippingCost(speed, 'AUD');
-  const shippingNpr = getShippingCost(speed, 'NPR');
-  const priceText = formatPrice(itemsAud + shippingAud, itemsNpr + shippingNpr);
-  totalEl.textContent = `Order Total: ${priceText}`;
+  refreshOrderSummary(true);
 }
 
 // ============================================================
@@ -2174,6 +2226,8 @@ function submitPayment() {
         const form = document.getElementById('order-form');
         if (form) form.reset();
         paymentScreenshotBase64 = null;
+        isOrderSummaryGenerated = false;
+        window._orderData = null;
       } else {
         renderErrorScreen(data, paymentRef);
       }
