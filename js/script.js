@@ -836,10 +836,12 @@ function setCurrency(currency) {
   updateConditionalRequiredFields();
 
   // Update all prices on the page
-  document.querySelectorAll('.product-card-price').forEach(el => {
+  document.querySelectorAll('.product-card-price, .occasion-card-price-tag').forEach(el => {
     const aud = parseFloat(el.dataset.aud);
     const npr = parseFloat(el.dataset.npr);
-    el.textContent = formatPrice(aud, npr);
+    if (!isNaN(aud)) {
+      el.textContent = formatPrice(aud, npr);
+    }
   });
 
   // Re-render occasion specials with updated currency
@@ -860,8 +862,8 @@ function setCurrency(currency) {
 const NPR_CONVERSION_RATE = 109.67;
 
 // Shipping Rates Configuration
-// Normal delivery: 40 AUD -> in NPR: Math.round(40 * 109.67) = 4387
-// Express delivery: 50 AUD -> in NPR: Math.round(50 * 109.67) = 5484
+// Normal delivery: 40 AUD -> in NPR: Math.ceil(40 * 109.67) = 4387
+// Express delivery: 50 AUD -> in NPR: Math.ceil(50 * 109.67) = 5484
 const SHIPPING_CONFIG = {
   normal: {
     id: 'normal',
@@ -880,7 +882,7 @@ const SHIPPING_CONFIG = {
 function getShippingCost(type, currency = currentCurrency) {
   const method = SHIPPING_CONFIG[type] || SHIPPING_CONFIG.normal;
   if (currency === 'NPR') {
-    return Math.round(method.priceAUD * NPR_CONVERSION_RATE);
+    return Math.ceil(method.priceAUD * NPR_CONVERSION_RATE);
   }
   return method.priceAUD;
 }
@@ -952,7 +954,7 @@ function enforceRealBouquetDelivery() {
 
 function getNprPrice(aud, npr) {
   const value = (npr && npr > 0) ? npr : (aud || 0) * NPR_CONVERSION_RATE;
-  return Math.round(value); // whole rupees, no decimals
+  return Math.ceil(value); // whole rupees, round up any decimals (e.g. 10.2 -> 11)
 }
 
 function formatPrice(aud, npr) {
@@ -1600,7 +1602,7 @@ function openDatePicker() {
     try {
       dateInput.showPicker();
       return;
-    } catch (err) {}
+    } catch (err) { }
   }
   dateInput.focus();
 }
@@ -2931,7 +2933,7 @@ function renderOccasionSpecials() {
     const priceHtml = formatPrice(o.priceAUD, o.priceNPR);
 
     return `
-      <article class="occasion-card fade-in" data-occasion-id="${escapeHtml(o.id)}">
+      <article class="occasion-card fade-in visible" data-occasion-id="${escapeHtml(o.id)}">
         <div class="occasion-card-badge">
           ${badgeHtml}
         </div>
@@ -2942,7 +2944,7 @@ function renderOccasionSpecials() {
         <div class="occasion-card-body" style="text-align:center;">
           <div>
             <h3 class="occasion-card-name">${escapeHtml(o.name)}</h3>
-            <div class="occasion-card-price-tag">${priceHtml}</div>
+            <div class="occasion-card-price-tag" data-aud="${o.priceAUD}" data-npr="${o.priceNPR}">${priceHtml}</div>
             <p class="occasion-card-desc">${escapeHtml(o.teaser)}</p>
           </div>
           <div class="occasion-card-actions">
@@ -2957,6 +2959,8 @@ function renderOccasionSpecials() {
       </article>
     `;
   }).join('');
+
+  observeFadeIns();
 }
 
 function openOccasionModal(occasionId) {
